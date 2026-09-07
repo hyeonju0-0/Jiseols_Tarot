@@ -204,17 +204,3 @@ const fortuneMessages = {
     ]
   }
 };
-
-=====================================
-
-const overallMessage = getRandomFortune("overall", 4);
-const moneyMessage = getRandomFortune("money", 3);
-const loveMessage = getRandomFortune("love", 5);
-const studyMessage = getRandomFortune("study", 4);
-const healthMessage = getRandomFortune("health", 2);
-
-console.log(overallMessage);
-console.log(moneyMessage);
-console.log(loveMessage);
-console.log(studyMessage);
-console.log(healthMessage);

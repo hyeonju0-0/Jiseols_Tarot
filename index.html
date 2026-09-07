@@ -26,14 +26,16 @@
 
     html,
     body {
-      min-height: 100%;
+      height: 100%;
+      height: 100dvh;
+      max-height: 100dvh;
+      overflow: hidden;
       background: var(--bg-deep);
       color: var(--text);
       font-family: "Galmuri11", "Galmuri14", "Pretendard", sans-serif;
     }
 
     body {
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
@@ -135,18 +137,20 @@
 
     /* ===== Layout ===== */
     .layout {
-      flex: 1;
+      flex: 1 1 auto;
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(400px, 480px);
       gap: 18px;
       padding: 16px;
       min-height: 0;
+      overflow: hidden;
     }
 
     /* ===== Main stage ===== */
     .stage {
       position: relative;
-      min-height: min(860px, calc(100vh - var(--header-h) - 32px));
+      min-height: 0;
+      height: 100%;
       border-radius: 12px;
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -155,7 +159,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
-      padding: 16px 16px 20px;
+      padding: clamp(10px, 1.6vh, 16px) 16px clamp(18px, 2.6vh, 28px);
     }
 
     .stage-bg {
@@ -182,10 +186,11 @@
       position: relative;
       z-index: 2;
       width: min(100%, 820px);
+      max-height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: clamp(8px, 1.4vh, 16px);
       text-align: center;
     }
 
@@ -215,7 +220,7 @@
     }
 
     .hero-title {
-      font-size: clamp(40px, 5.5vw, 58px);
+      font-size: clamp(28px, 5.2vh, 58px);
       text-shadow:
         0 0 14px rgba(240, 200, 90, 0.5),
         2px 2px 0 rgba(0, 0, 0, 0.55);
@@ -236,10 +241,13 @@
     }
 
     .wizard-cat {
-      width: min(380px, 56vw);
+      width: auto;
       height: auto;
+      max-width: min(380px, 42vw);
+      max-height: min(380px, 30dvh);
+      object-fit: contain;
       display: block;
-      margin: -10px 0 6px;
+      margin: -6px 0 0;
       mix-blend-mode: lighten;
       filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.5));
       animation: bob 3.2s ease-in-out infinite;
@@ -253,8 +261,8 @@
     }
 
     .card {
-      width: 148px;
-      height: 222px;
+      width: clamp(96px, 13.6dvh, 148px);
+      height: clamp(144px, 20.4dvh, 222px);
       border-radius: 14px;
       overflow: hidden;
       box-shadow: 0 8px 0 rgba(0, 0, 0, 0.35);
@@ -282,12 +290,12 @@
       justify-content: center;
       gap: 12px;
       min-width: 300px;
-      padding: 18px 42px;
+      padding: clamp(12px, 1.6vh, 18px) 42px;
       border-radius: 999px;
       background: linear-gradient(180deg, #4a2f86 0%, #2d1a58 100%);
       border: 3px solid var(--gold);
       color: var(--text);
-      font-size: 20px;
+      font-size: clamp(16px, 1.9vh, 20px);
       box-shadow:
         0 6px 0 #1a0f35,
         0 0 24px rgba(240, 200, 90, 0.28);
@@ -317,6 +325,7 @@
       flex-direction: column;
       gap: 18px;
       min-height: 0;
+      overflow: auto;
     }
 
     .panel {
@@ -642,7 +651,7 @@
     .result-meaning-col {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       min-width: 0;
       min-height: 0;
       max-height: 100%;
@@ -650,7 +659,7 @@
       opacity: 0;
       transform: translateX(24px);
       transition: opacity 0.45s ease 0.15s, transform 0.45s ease 0.15s;
-      overflow: hidden;
+      overflow: auto;
     }
 
     .result-view.is-ready .result-meaning-col {
@@ -666,14 +675,17 @@
       flex-shrink: 0;
     }
 
-    .result-keywords {
+    .result-lucky {
       display: flex;
       flex-wrap: wrap;
       gap: 7px;
       flex-shrink: 0;
     }
 
-    .result-keywords span {
+    .result-lucky > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       padding: 5px 11px;
       border-radius: 999px;
       background: rgba(90, 60, 30, 0.12);
@@ -682,13 +694,59 @@
       color: #4a3520;
     }
 
+    .lucky-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 1px solid rgba(90, 60, 30, 0.4);
+      flex-shrink: 0;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+    }
+
+    .result-fortunes {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 0;
+      flex: 1;
+      overflow: auto;
+    }
+
+    .fortune-row {
+      display: grid;
+      grid-template-columns: 58px 78px minmax(0, 1fr);
+      gap: 6px 8px;
+      align-items: baseline;
+    }
+
+    .fortune-row .fortune-label {
+      color: #3b2a16;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .fortune-row .fortune-stars {
+      color: #8a6a30;
+      font-size: 12px;
+      letter-spacing: -1px;
+      white-space: nowrap;
+    }
+
+    .fortune-row .fortune-msg {
+      min-width: 0;
+      color: #5d4630;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
     .result-description {
       color: #3f2f1c;
-      font-size: 16px;
-      line-height: 1.6;
+      font-size: 15px;
+      line-height: 1.55;
       white-space: pre-wrap;
-      overflow: hidden;
-      flex: 1;
+      overflow: auto;
+      flex: 0 1 auto;
+      max-height: 28%;
       min-height: 0;
     }
 
@@ -770,9 +828,45 @@
       50% { transform: translateY(-4px); }
     }
 
+    @media (max-height: 820px) {
+      .hero-sub {
+        display: none;
+      }
+
+      .speech {
+        padding: 10px 16px;
+        font-size: 13px;
+      }
+
+      .wizard-cat {
+        max-height: min(300px, 28dvh);
+      }
+
+      .panel {
+        padding: 18px 20px;
+      }
+
+      .panel-title {
+        margin-bottom: 14px;
+      }
+
+      .feature-list {
+        gap: 12px;
+      }
+    }
+
     @media (max-width: 900px) {
+      html,
+      body {
+        height: auto;
+        max-height: none;
+        overflow: auto;
+        min-height: 100dvh;
+      }
+
       .layout {
         grid-template-columns: 1fr;
+        overflow: visible;
       }
 
       .brand-tagline,
@@ -781,7 +875,8 @@
       }
 
       .stage {
-        min-height: 640px;
+        min-height: calc(100dvh - var(--header-h) - 32px);
+        height: calc(100dvh - var(--header-h) - 32px);
       }
 
       .pick-cards {
@@ -800,6 +895,10 @@
 
       .result-card-img {
         width: min(100%, 190px);
+      }
+
+      .fortune-row {
+        grid-template-columns: 54px 72px minmax(0, 1fr);
       }
     }
 
@@ -833,12 +932,13 @@
       }
 
       .card {
-        width: 100px;
-        height: 150px;
+        width: clamp(88px, 14dvh, 100px);
+        height: clamp(132px, 21dvh, 150px);
       }
 
       .wizard-cat {
-        width: min(280px, 72vw);
+        max-width: min(280px, 72vw);
+        max-height: min(280px, 32dvh);
       }
 
       .draw-btn {
@@ -849,6 +949,7 @@
     }
   </style>
   <script src="tarot-meanings.js"></script>
+  <script src="fortune-messages.js"></script>
 </head>
 <body>
   <header class="site-header">
@@ -980,7 +1081,8 @@
       </div>
       <div class="result-meaning-col">
         <h3 class="result-title" id="result-title"></h3>
-        <div class="result-keywords" id="result-keywords"></div>
+        <div class="result-lucky" id="result-lucky"></div>
+        <div class="result-fortunes" id="result-fortunes"></div>
         <p class="result-description" id="result-description"></p>
         <p class="result-cat" id="result-cat"></p>
         <div class="result-actions">
@@ -1005,6 +1107,90 @@
       { id: 21, file: "21.TheWorld.png", name: "The World", ko: "세계" },
     ];
 
+    const CARD_FORTUNE_SCORES = {
+      0: {
+        upright: { overall: 4, money: 3, love: 4, study: 3, health: 4 },
+        reversed: { overall: 2, money: 2, love: 2, study: 2, health: 2 },
+      },
+      6: {
+        upright: { overall: 4, money: 3, love: 5, study: 3, health: 4 },
+        reversed: { overall: 2, money: 2, love: 1, study: 3, health: 2 },
+      },
+      7: {
+        upright: { overall: 5, money: 4, love: 3, study: 5, health: 4 },
+        reversed: { overall: 2, money: 2, love: 2, study: 2, health: 2 },
+      },
+      9: {
+        upright: { overall: 3, money: 3, love: 2, study: 5, health: 3 },
+        reversed: { overall: 2, money: 2, love: 1, study: 2, health: 2 },
+      },
+      10: {
+        upright: { overall: 5, money: 5, love: 4, study: 4, health: 4 },
+        reversed: { overall: 2, money: 1, love: 2, study: 2, health: 2 },
+      },
+      13: {
+        upright: { overall: 3, money: 3, love: 3, study: 3, health: 3 },
+        reversed: { overall: 2, money: 2, love: 1, study: 2, health: 2 },
+      },
+      15: {
+        upright: { overall: 2, money: 2, love: 4, study: 2, health: 2 },
+        reversed: { overall: 3, money: 2, love: 2, study: 3, health: 3 },
+      },
+      16: {
+        upright: { overall: 1, money: 1, love: 2, study: 2, health: 1 },
+        reversed: { overall: 1, money: 2, love: 2, study: 2, health: 1 },
+      },
+      19: {
+        upright: { overall: 5, money: 5, love: 5, study: 5, health: 5 },
+        reversed: { overall: 3, money: 3, love: 3, study: 3, health: 2 },
+      },
+      21: {
+        upright: { overall: 5, money: 5, love: 5, study: 5, health: 5 },
+        reversed: { overall: 4, money: 3, love: 3, study: 4, health: 3 },
+      },
+    };
+
+    const FORTUNE_LABELS = [
+      { key: "overall", label: "종합운" },
+      { key: "money", label: "재물운" },
+      { key: "love", label: "애정운" },
+      { key: "study", label: "학업운" },
+      { key: "health", label: "건강운" },
+    ];
+
+    const LUCKY_ITEMS = [
+      "행운 거북이",
+      "미니 다이어리",
+      "조약돌",
+      "손거울",
+      "실버 반지",
+      "책갈피",
+      "500원",
+      "진주 귀걸이",
+      "동전 지갑",
+      "별 모양 스티커",
+      "손수건",
+      "손목시계",
+      "작은 화분",
+      "콧수염 안경",
+      "검정 볼펜",
+    ];
+
+    const LUCKY_COLORS = [
+      { name: "보라", hex: "#7B5EA7" },
+      { name: "남색", hex: "#2F4A7A" },
+      { name: "골드", hex: "#D4A84B" },
+      { name: "실버", hex: "#C0C5CE" },
+      { name: "분홍", hex: "#E8A0B5" },
+      { name: "초록", hex: "#5E9B6A" },
+      { name: "하늘", hex: "#7EB6D9" },
+      { name: "하양", hex: "#F5F2EA" },
+      { name: "검정", hex: "#2A2A2A" },
+      { name: "주황", hex: "#E39A5C" },
+      { name: "빨강", hex: "#8B3A4A" },
+      { name: "파랑", hex: "#7DC8B8" },
+    ];
+
     function shuffle(list) {
       const next = list.slice();
       for (let i = next.length - 1; i > 0; i -= 1) {
@@ -1012,6 +1198,43 @@
         [next[i], next[j]] = [next[j], next[i]];
       }
       return next;
+    }
+
+    function pickFortuneMessage(category, score, seed) {
+      if (typeof fortuneMessages === "undefined") return "";
+      const list = fortuneMessages[category] && fortuneMessages[category][score];
+      if (!list || !list.length) return "";
+      return list[Math.abs(seed) % list.length];
+    }
+
+    function starEmoji(score) {
+      const filled = Math.max(0, Math.min(5, Number(score) || 0));
+      return "⭐".repeat(filled) + "☆".repeat(5 - filled);
+    }
+
+    function getCardFortunes(cardId, orientation) {
+      const scores =
+        (CARD_FORTUNE_SCORES[cardId] && CARD_FORTUNE_SCORES[cardId][orientation]) ||
+        { overall: 3, money: 3, love: 3, study: 3, health: 3 };
+
+      return FORTUNE_LABELS.map((item, index) => {
+        const score = scores[item.key];
+        const seed = cardId * 17 + index * 3 + (orientation === "reversed" ? 11 : 0);
+        return {
+          label: item.label,
+          score,
+          stars: starEmoji(score),
+          message: pickFortuneMessage(item.key, score, seed),
+        };
+      });
+    }
+
+    function pickLuckyExtras(cardId, orientation) {
+      const seed = cardId * 13 + (orientation === "reversed" ? 7 : 3);
+      const item = LUCKY_ITEMS[Math.abs(seed) % LUCKY_ITEMS.length];
+      const color = LUCKY_COLORS[Math.abs(seed * 5 + 2) % LUCKY_COLORS.length];
+      const number = (Math.abs(seed * 9) % 31) + 1;
+      return { item, color, numbers: String(number) };
     }
 
     const drawBtn = document.getElementById("draw-btn");
@@ -1023,7 +1246,8 @@
     const resultCardName = document.getElementById("result-card-name");
     const resultCardEn = document.getElementById("result-card-en");
     const resultTitle = document.getElementById("result-title");
-    const resultKeywords = document.getElementById("result-keywords");
+    const resultLucky = document.getElementById("result-lucky");
+    const resultFortunes = document.getElementById("result-fortunes");
     const resultDescription = document.getElementById("result-description");
     const resultCat = document.getElementById("result-cat");
 
@@ -1068,6 +1292,8 @@
       const meaningRoot = (typeof tarotMessages !== "undefined" && tarotMessages[card.id]) || null;
       const meaning = meaningRoot ? meaningRoot[orientation] : null;
       const isReversed = orientation === "reversed";
+      const fortunes = getCardFortunes(card.id, orientation);
+      const lucky = pickLuckyExtras(card.id, orientation);
 
       resultCardImg.src = "assets/Card/" + card.file;
       resultCardImg.alt = card.ko;
@@ -1076,18 +1302,35 @@
       resultCardName.textContent = card.ko;
       resultCardEn.textContent = card.name;
 
+      resultLucky.innerHTML =
+        "<span>행운 아이템 · " + lucky.item + "</span>" +
+        "<span>행운 숫자 · " + lucky.numbers + "</span>" +
+        "<span>" +
+          "행운 색깔 · " +
+          '<span class="lucky-swatch" style="background:' + lucky.color.hex + '"></span>' +
+          lucky.color.name +
+        "</span>";
+
+      resultFortunes.innerHTML = fortunes
+        .map(function (item) {
+          return (
+            '<div class="fortune-row">' +
+              '<span class="fortune-label">' + item.label + "</span>" +
+              '<span class="fortune-stars" aria-label="' + item.score + '점">' + item.stars + "</span>" +
+              '<span class="fortune-msg">' + (item.message || "") + "</span>" +
+            "</div>"
+          );
+        })
+        .join("");
+
       if (meaning) {
         resultTitle.textContent = meaning.title;
         resultDescription.textContent = meaning.description;
         resultCat.textContent = meaning.catMessage;
-        resultKeywords.innerHTML = (meaning.keywords || [])
-          .map((word) => "<span>" + word + "</span>")
-          .join("");
       } else {
         resultTitle.textContent = "카드 해석을 불러오지 못했어요.";
         resultDescription.textContent = "TarotCardMeanings 데이터를 확인해주세요.";
         resultCat.textContent = "";
-        resultKeywords.innerHTML = "";
       }
     }
 

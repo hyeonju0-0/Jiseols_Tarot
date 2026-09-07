@@ -442,8 +442,8 @@
       aspect-ratio: var(--box-ratio);
       height: auto;
       max-height: 88vh;
-      overflow: auto;
-      padding: 8% 9% 6%;
+      overflow: hidden;
+      padding: 7.5% 8.5% 5.5%;
       border-radius: 12px;
       border: none;
       background:
@@ -453,11 +453,12 @@
       text-align: center;
       display: flex;
       flex-direction: column;
+      container-type: size;
     }
 
     .draw-modal-title {
-      font-size: 26px;
-      margin-bottom: 6px;
+      font-size: clamp(15px, 4.6cqh, 28px);
+      margin-bottom: clamp(2px, 0.8cqh, 8px);
       flex-shrink: 0;
       color: #3b2a16;
       text-shadow: 0 1px 0 rgba(255, 245, 220, 0.55);
@@ -465,28 +466,31 @@
 
     .draw-modal-sub {
       color: #5d4630;
-      font-size: 15px;
-      margin-bottom: 12px;
+      font-size: clamp(11px, 2.5cqh, 16px);
+      margin-bottom: clamp(6px, 1.5cqh, 12px);
       flex-shrink: 0;
     }
 
     .pick-cards {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 12px 14px;
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      gap: clamp(6px, 1.6cqh, 14px) clamp(6px, 1.2cqw, 14px);
       align-content: center;
       justify-items: center;
       flex: 1;
       width: 100%;
       min-height: 0;
-      padding: 6px 1% 2px;
+      padding: clamp(2px, 0.8cqh, 8px) 1% 0;
     }
 
     .pick-card {
-      width: min(100%, 136px);
+      width: min(100%, 20cqh);
       aspect-ratio: 2 / 3;
+      height: auto;
+      max-height: 100%;
       padding: 0;
-      border-radius: 10px;
+      border-radius: clamp(6px, 1.2cqh, 10px);
       overflow: hidden;
       box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3);
       background: #2a1a4a;
@@ -525,15 +529,15 @@
     }
 
     .draw-modal-close {
-      margin-top: 10px;
+      margin-top: clamp(6px, 1.4cqh, 12px);
       align-self: center;
-      min-width: 130px;
-      padding: 10px 22px;
+      min-width: 0;
+      padding: clamp(6px, 1.3cqh, 10px) clamp(14px, 2.4cqw, 22px);
       border-radius: 999px;
       border: 2px solid rgba(90, 60, 30, 0.45);
       background: rgba(255, 245, 220, 0.72);
       color: #3b2a16;
-      font-size: 14px;
+      font-size: clamp(12px, 2.2cqh, 15px);
       flex-shrink: 0;
     }
 
@@ -565,10 +569,7 @@
       height: auto;
       max-height: 88vh;
       display: grid;
-      grid-template-columns: minmax(220px, 36%) minmax(0, 1fr);
-      gap: 24px;
-      align-items: center;
-      padding: 7% 8% 5.5%;
+      padding: 0;
       border-radius: 12px;
       border: none;
       background:
@@ -581,6 +582,17 @@
       transition: opacity 0.45s ease, transform 0.45s ease;
     }
 
+    .result-panel-inner {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 34%) minmax(0, 1fr);
+      gap: clamp(8px, 1.5vh, 20px);
+      align-items: stretch;
+      padding: clamp(18px, 5vh, 48px) clamp(20px, 5vw, 64px) clamp(14px, 4vh, 36px);
+      box-sizing: border-box;
+    }
+
     .result-view.is-ready .result-panel {
       opacity: 1;
       transform: translateY(0);
@@ -591,18 +603,21 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: clamp(4px, 0.8vh, 10px);
       text-align: center;
+      min-width: 0;
       min-height: 0;
+      height: 100%;
     }
 
     .result-card-img {
-      width: min(100%, 260px);
-      max-height: 58%;
+      width: min(100%, 16vw, 20vh);
+      height: auto;
+      max-height: 32vh;
       aspect-ratio: 2 / 3;
       object-fit: cover;
-      border-radius: 12px;
-      box-shadow: 0 10px 0 rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.3);
       opacity: 0;
       transform: scale(0.92);
       transition: opacity 0.35s ease, transform 0.45s ease;
@@ -630,28 +645,28 @@
     .result-orientation {
       display: inline-flex;
       align-self: center;
-      padding: 5px 14px;
+      padding: 3px 10px;
       border-radius: 999px;
       border: 1px solid rgba(90, 60, 30, 0.4);
       background: rgba(255, 245, 220, 0.55);
       color: #6a4a1e;
-      font-size: 14px;
+      font-size: clamp(10px, 1.2vh, 13px);
     }
 
     .result-card-name {
-      font-size: 30px;
+      font-size: clamp(13px, 2.1vh, 26px);
       color: #3b2a16;
     }
 
     .result-card-en {
       color: #5d4630;
-      font-size: 14px;
+      font-size: clamp(10px, 1.2vh, 13px);
     }
 
     .result-meaning-col {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: clamp(4px, 0.8vh, 8px);
       min-width: 0;
       min-height: 0;
       max-height: 100%;
@@ -668,8 +683,8 @@
     }
 
     .result-title {
-      font-size: clamp(20px, 2.2vw, 28px);
-      line-height: 1.4;
+      font-size: clamp(12px, 1.7vh, 22px);
+      line-height: 1.35;
       color: #3b2a16;
       text-shadow: 0 1px 0 rgba(255, 245, 220, 0.5);
       flex-shrink: 0;
@@ -678,25 +693,25 @@
     .result-lucky {
       display: flex;
       flex-wrap: wrap;
-      gap: 7px;
+      gap: clamp(4px, 0.6vh, 7px);
       flex-shrink: 0;
     }
 
     .result-lucky > span {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 5px 11px;
+      gap: 5px;
+      padding: 3px 9px;
       border-radius: 999px;
       background: rgba(90, 60, 30, 0.12);
       border: 1px solid rgba(90, 60, 30, 0.28);
-      font-size: 13px;
+      font-size: clamp(10px, 1.15vh, 12px);
       color: #4a3520;
     }
 
     .lucky-swatch {
-      width: 12px;
-      height: 12px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       border: 1px solid rgba(90, 60, 30, 0.4);
       flex-shrink: 0;
@@ -706,7 +721,7 @@
     .result-fortunes {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: clamp(2px, 0.5vh, 6px);
       min-height: 0;
       flex: 1;
       overflow: auto;
@@ -714,20 +729,20 @@
 
     .fortune-row {
       display: grid;
-      grid-template-columns: 58px 78px minmax(0, 1fr);
-      gap: 6px 8px;
+      grid-template-columns: max-content max-content minmax(0, 1fr);
+      gap: 2px 8px;
       align-items: baseline;
     }
 
     .fortune-row .fortune-label {
       color: #3b2a16;
-      font-size: 13px;
+      font-size: clamp(10px, 1.2vh, 13px);
       font-weight: 700;
     }
 
     .fortune-row .fortune-stars {
       color: #8a6a30;
-      font-size: 12px;
+      font-size: clamp(10px, 1.15vh, 12px);
       letter-spacing: -1px;
       white-space: nowrap;
     }
@@ -735,50 +750,50 @@
     .fortune-row .fortune-msg {
       min-width: 0;
       color: #5d4630;
-      font-size: 13px;
-      line-height: 1.4;
+      font-size: clamp(10px, 1.2vh, 13px);
+      line-height: 1.35;
     }
 
     .result-description {
       color: #3f2f1c;
-      font-size: 15px;
-      line-height: 1.55;
+      font-size: clamp(11px, 1.25vh, 15px);
+      line-height: 1.45;
       white-space: pre-wrap;
       overflow: auto;
       flex: 0 1 auto;
-      max-height: 28%;
+      max-height: 26%;
       min-height: 0;
     }
 
     .result-cat {
-      margin-top: 2px;
-      padding: 12px 14px;
-      border-radius: 12px;
+      margin-top: 0;
+      padding: clamp(6px, 0.9vh, 10px) clamp(8px, 1vh, 12px);
+      border-radius: 10px;
       background: rgba(120, 70, 30, 0.12);
       border: 1px solid rgba(120, 70, 30, 0.28);
       color: #5a3a14;
-      font-size: 15px;
-      line-height: 1.5;
+      font-size: clamp(10px, 1.2vh, 13px);
+      line-height: 1.4;
       flex-shrink: 0;
     }
 
     .result-actions {
-      margin-top: 4px;
+      margin-top: 0;
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
-      padding-top: 4px;
+      padding-top: 0;
       flex-shrink: 0;
     }
 
     .result-btn {
-      min-width: 130px;
-      padding: 10px 18px;
+      min-width: 0;
+      padding: 6px 14px;
       border-radius: 999px;
       border: 2px solid rgba(90, 60, 30, 0.45);
       background: rgba(255, 245, 220, 0.72);
       color: #3b2a16;
-      font-size: 14px;
+      font-size: clamp(11px, 1.2vh, 14px);
     }
 
     .result-btn.primary {
@@ -880,31 +895,11 @@
       }
 
       .pick-cards {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 12px;
         min-height: 0;
       }
 
-      .result-panel {
-        grid-template-columns: 1fr;
-        width: min(94vw, calc(88vh * 1536 / 1024));
-        aspect-ratio: 1536 / 1024;
-        height: auto;
-        max-height: 88vh;
-      }
-
-      .result-card-img {
-        width: min(100%, 190px);
-      }
-
-      .fortune-row {
-        grid-template-columns: 54px 72px minmax(0, 1fr);
-      }
-    }
-
-    @media (max-width: 640px) {
-      .pick-cards {
-        grid-template-columns: repeat(2, 1fr);
+      .result-panel-inner {
+        grid-template-columns: minmax(0, 32%) minmax(0, 1fr);
       }
     }
 
@@ -1071,6 +1066,7 @@
 
   <div class="result-view" id="result-view" aria-hidden="true">
     <div class="result-panel">
+      <div class="result-panel-inner">
       <div class="result-card-col">
         <img class="result-card-img" id="result-card-img" alt="" />
         <div class="result-card-meta">
@@ -1089,6 +1085,7 @@
           <button class="result-btn primary" id="result-again" type="button">다시 뽑기</button>
           <button class="result-btn" id="result-home" type="button">홈으로</button>
         </div>
+      </div>
       </div>
     </div>
   </div>
@@ -1335,12 +1332,22 @@
     }
 
     function getResultCardTargetRect() {
-      const panel = resultView.querySelector(".result-panel");
-      const panelRect = panel.getBoundingClientRect();
-      const width = Math.min(260, panelRect.width * 0.3);
+      const imgRect = resultCardImg.getBoundingClientRect();
+      if (imgRect.width > 8 && imgRect.height > 8) {
+        return {
+          left: imgRect.left,
+          top: imgRect.top,
+          width: imgRect.width,
+          height: imgRect.height,
+        };
+      }
+
+      const col = resultView.querySelector(".result-card-col");
+      const colRect = col.getBoundingClientRect();
+      const width = Math.min(colRect.width * 0.86, colRect.height * 0.58 * 2 / 3);
       const height = width * 1.5;
-      const left = panelRect.left + Math.max(24, (panelRect.width * 0.38 - width) / 2);
-      const top = panelRect.top + (panelRect.height - height) / 2 - 24;
+      const left = colRect.left + (colRect.width - width) / 2;
+      const top = colRect.top + Math.max(0, (colRect.height - height) / 2 - 12);
       return { left, top, width, height };
     }
 

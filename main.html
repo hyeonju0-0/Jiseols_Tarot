@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>지설이의 타로</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link href="https://cdn.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-deep: #0b0818;
+      --panel: rgba(22, 14, 42, 0.9);
+      --panel-border: rgba(230, 220, 255, 0.45);
+      --gold: #f0c85a;
+      --gold-soft: #d4a84b;
+      --text: #f7f2ff;
+      --muted: #b7a8d4;
+      --header-h: 96px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      background: var(--bg-deep);
+      color: var(--text);
+      font-family: "Galmuri11", "Galmuri14", "Pretendard", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+      border: none;
+      cursor: pointer;
+      background: none;
+      color: inherit;
+    }
+
+    img {
+      image-rendering: pixelated;
+    }
+
+    /* ===== Header ===== */
+    .site-header {
+      height: var(--header-h);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 0 36px;
+      background: linear-gradient(180deg, #1a142e 0%, #12101f 100%);
+      border-bottom: 2px solid rgba(240, 200, 90, 0.25);
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-size: 30px;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+
+    .brand-divider {
+      width: 2px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.25);
+      flex-shrink: 0;
+    }
+
+    .brand-tagline {
+      color: var(--muted);
+      font-size: 18px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      flex-shrink: 0;
+    }
+
+    .nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 19px;
+      color: var(--muted);
+      transition: color 0.15s ease;
+    }
+
+    .nav a:hover,
+    .nav a.is-active {
+      color: var(--text);
+    }
+
+    .nav-icon {
+      width: 34px;
+      height: 34px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    /* ===== Layout ===== */
+    .layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(400px, 480px);
+      gap: 18px;
+      padding: 16px;
+      min-height: 0;
+    }
+
+    /* ===== Main stage ===== */
+    .stage {
+      position: relative;
+      min-height: min(860px, calc(100vh - var(--header-h) - 32px));
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #120c22;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 16px 16px 20px;
+    }
+
+    .stage-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .stage-veil {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(10, 6, 20, 0.22) 0%, rgba(10, 6, 20, 0.05) 35%, rgba(10, 6, 20, 0.42) 100%);
+    }
+
+    .stage-content {
+      position: relative;
+      z-index: 2;
+      width: min(100%, 820px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .speech {
+      align-self: center;
+      max-width: 380px;
+      padding: 14px 22px;
+      background: #fff;
+      color: #2a2040;
+      border-radius: 18px;
+      font-size: 15px;
+      line-height: 1.4;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+      position: relative;
+      animation: floaty 2.8s ease-in-out infinite;
+    }
+
+    .speech::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: -8px;
+      border-width: 8px 8px 0 8px;
+      border-style: solid;
+      border-color: #fff transparent transparent transparent;
+    }
+
+    .hero-title {
+      font-size: clamp(40px, 5.5vw, 58px);
+      text-shadow:
+        0 0 14px rgba(240, 200, 90, 0.5),
+        2px 2px 0 rgba(0, 0, 0, 0.55);
+      letter-spacing: -0.03em;
+    }
+
+    .hero-title .sparkle {
+      color: var(--gold);
+      font-size: 0.7em;
+      vertical-align: middle;
+    }
+
+    .hero-sub {
+      margin-top: -4px;
+      color: #ddd2f5;
+      font-size: 16px;
+      text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.55);
+    }
+
+    .wizard-cat {
+      width: min(380px, 56vw);
+      height: auto;
+      display: block;
+      margin: -10px 0 6px;
+      mix-blend-mode: lighten;
+      filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.5));
+      animation: bob 3.2s ease-in-out infinite;
+    }
+
+    .cards {
+      display: flex;
+      gap: 18px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      width: 148px;
+      height: 222px;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.35);
+      transition: transform 0.15s ease;
+      padding: 0;
+    }
+
+    .card:hover,
+    .card:focus-visible {
+      transform: translateY(-8px);
+      outline: 2px solid var(--gold);
+      outline-offset: 2px;
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .draw-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      min-width: 300px;
+      padding: 18px 42px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #4a2f86 0%, #2d1a58 100%);
+      border: 3px solid var(--gold);
+      color: var(--text);
+      font-size: 20px;
+      box-shadow:
+        0 6px 0 #1a0f35,
+        0 0 24px rgba(240, 200, 90, 0.28);
+      transition: transform 0.12s ease, filter 0.12s ease;
+    }
+
+    .draw-btn img {
+      width: 28px;
+      height: 28px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+
+    .draw-btn:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    .draw-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #1a0f35;
+    }
+
+    /* ===== Sidebar ===== */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      min-height: 0;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      backdrop-filter: blur(6px);
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      margin-bottom: 24px;
+    }
+
+    .panel-title .icon {
+      width: 54px;
+      height: 54px;
+      object-fit: cover;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .panel-title .spark {
+      color: var(--gold);
+      font-size: 1.15em;
+    }
+
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .feature {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .feature-icon {
+      width: 68px;
+      height: 68px;
+      object-fit: cover;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .feature p {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.65;
+    }
+
+    .feature strong {
+      display: block;
+      color: var(--text);
+      font-size: 19px;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .quote {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      padding: 22px;
+    }
+
+    .quote-cat {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 14px;
+      flex-shrink: 0;
+    }
+
+    .quote p {
+      font-size: 17px;
+      line-height: 1.6;
+      color: #efe6ff;
+    }
+
+    /* ===== Draw modal ===== */
+    .draw-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 3vh 2vw;
+    }
+
+    .draw-modal.is-open {
+      display: flex;
+    }
+
+    .draw-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(6, 4, 14, 0.75);
+    }
+
+    .draw-modal-panel {
+      --box-ratio: 1536 / 1024;
+      position: relative;
+      z-index: 1;
+      width: min(94vw, calc(88vh * 1536 / 1024), 1536px);
+      aspect-ratio: var(--box-ratio);
+      height: auto;
+      max-height: 88vh;
+      overflow: auto;
+      padding: 8% 9% 6%;
+      border-radius: 12px;
+      border: none;
+      background:
+        #120c22
+        url("assets/card_box.png") center center / 100% 100% no-repeat;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .draw-modal-title {
+      font-size: 26px;
+      margin-bottom: 6px;
+      flex-shrink: 0;
+      color: #3b2a16;
+      text-shadow: 0 1px 0 rgba(255, 245, 220, 0.55);
+    }
+
+    .draw-modal-sub {
+      color: #5d4630;
+      font-size: 15px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .pick-cards {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px 14px;
+      align-content: center;
+      justify-items: center;
+      flex: 1;
+      width: 100%;
+      min-height: 0;
+      padding: 6px 1% 2px;
+    }
+
+    .pick-card {
+      width: min(100%, 136px);
+      aspect-ratio: 2 / 3;
+      padding: 0;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3);
+      background: #2a1a4a;
+      transition: transform 0.15s ease, opacity 0.2s ease, filter 0.2s ease;
+    }
+
+    .pick-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.28s ease;
+    }
+
+    .pick-card:hover:not(:disabled):not(.is-flipped) {
+      transform: translateY(-4px);
+    }
+
+    .pick-card.is-flipping img {
+      transform: scaleX(0);
+    }
+
+    .pick-card.is-flipped {
+      transform: translateY(-4px) scale(1.03);
+      outline: 2px solid var(--gold);
+      outline-offset: 2px;
+    }
+
+    .pick-card.is-dimmed {
+      opacity: 0.4;
+      filter: grayscale(0.35);
+    }
+
+    .pick-card:disabled {
+      cursor: default;
+    }
+
+    .draw-modal-close {
+      margin-top: 10px;
+      align-self: center;
+      min-width: 130px;
+      padding: 10px 22px;
+      border-radius: 999px;
+      border: 2px solid rgba(90, 60, 30, 0.45);
+      background: rgba(255, 245, 220, 0.72);
+      color: #3b2a16;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .draw-modal-close:hover {
+      border-color: #8a6a30;
+      background: rgba(255, 248, 230, 0.92);
+    }
+
+    /* ===== Result view ===== */
+    .result-view {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 3vh 2vw;
+      background: rgba(6, 4, 14, 0.82);
+    }
+
+    .result-view.is-open {
+      display: flex;
+    }
+
+    .result-panel {
+      --box-ratio: 1536 / 1024;
+      width: min(94vw, calc(88vh * 1536 / 1024), 1536px);
+      aspect-ratio: var(--box-ratio);
+      height: auto;
+      max-height: 88vh;
+      display: grid;
+      grid-template-columns: minmax(220px, 36%) minmax(0, 1fr);
+      gap: 24px;
+      align-items: center;
+      padding: 7% 8% 5.5%;
+      border-radius: 12px;
+      border: none;
+      background:
+        #120c22
+        url("assets/card_box.png") center center / 100% 100% no-repeat;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .result-view.is-ready .result-panel {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .result-card-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+      min-height: 0;
+    }
+
+    .result-card-img {
+      width: min(100%, 260px);
+      max-height: 58%;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 10px 0 rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.35s ease, transform 0.45s ease;
+    }
+
+    .result-card-img.is-reversed {
+      transform: rotate(180deg) scale(0.92);
+    }
+
+    .result-view.is-ready .result-card-img {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .result-view.is-ready .result-card-img.is-reversed {
+      transform: rotate(180deg) scale(1);
+    }
+
+    .result-card-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .result-orientation {
+      display: inline-flex;
+      align-self: center;
+      padding: 5px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(90, 60, 30, 0.4);
+      background: rgba(255, 245, 220, 0.55);
+      color: #6a4a1e;
+      font-size: 14px;
+    }
+
+    .result-card-name {
+      font-size: 30px;
+      color: #3b2a16;
+    }
+
+    .result-card-en {
+      color: #5d4630;
+      font-size: 14px;
+    }
+
+    .result-meaning-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+      min-height: 0;
+      max-height: 100%;
+      text-align: left;
+      opacity: 0;
+      transform: translateX(24px);
+      transition: opacity 0.45s ease 0.15s, transform 0.45s ease 0.15s;
+      overflow: hidden;
+    }
+
+    .result-view.is-ready .result-meaning-col {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .result-title {
+      font-size: clamp(20px, 2.2vw, 28px);
+      line-height: 1.4;
+      color: #3b2a16;
+      text-shadow: 0 1px 0 rgba(255, 245, 220, 0.5);
+      flex-shrink: 0;
+    }
+
+    .result-keywords {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+
+    .result-keywords span {
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(90, 60, 30, 0.12);
+      border: 1px solid rgba(90, 60, 30, 0.28);
+      font-size: 13px;
+      color: #4a3520;
+    }
+
+    .result-description {
+      color: #3f2f1c;
+      font-size: 16px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      overflow: hidden;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .result-cat {
+      margin-top: 2px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(120, 70, 30, 0.12);
+      border: 1px solid rgba(120, 70, 30, 0.28);
+      color: #5a3a14;
+      font-size: 15px;
+      line-height: 1.5;
+      flex-shrink: 0;
+    }
+
+    .result-actions {
+      margin-top: 4px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .result-btn {
+      min-width: 130px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 2px solid rgba(90, 60, 30, 0.45);
+      background: rgba(255, 245, 220, 0.72);
+      color: #3b2a16;
+      font-size: 14px;
+    }
+
+    .result-btn.primary {
+      border-color: #8a6a30;
+      background: linear-gradient(180deg, #f0d9a0 0%, #d4b06a 100%);
+      color: #3b2a16;
+    }
+
+    .result-btn:hover {
+      filter: brightness(1.05);
+    }
+
+    .fly-card {
+      position: fixed;
+      z-index: 1200;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+      pointer-events: none;
+      transition:
+        left 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+        top 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+        width 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+        height 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.25s ease;
+    }
+
+    .fly-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .fly-card.is-reversed img {
+      transform: rotate(180deg);
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .brand-tagline,
+      .brand-divider {
+        display: none;
+      }
+
+      .stage {
+        min-height: 640px;
+      }
+
+      .pick-cards {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        min-height: 0;
+      }
+
+      .result-panel {
+        grid-template-columns: 1fr;
+        width: min(94vw, calc(88vh * 1536 / 1024));
+        aspect-ratio: 1536 / 1024;
+        height: auto;
+        max-height: 88vh;
+      }
+
+      .result-card-img {
+        width: min(100%, 190px);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .pick-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 560px) {
+      .site-header {
+        height: 72px;
+        padding: 0 14px;
+      }
+
+      .brand-logo {
+        width: 44px;
+        height: 44px;
+      }
+
+      .brand-title {
+        font-size: 20px;
+      }
+
+      .nav {
+        gap: 10px;
+      }
+
+      .nav a span.label {
+        display: none;
+      }
+
+      .card {
+        width: 100px;
+        height: 150px;
+      }
+
+      .wizard-cat {
+        width: min(280px, 72vw);
+      }
+
+      .draw-btn {
+        min-width: 240px;
+        padding: 14px 28px;
+        font-size: 17px;
+      }
+    }
+  </style>
+  <script src="tarot-meanings.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <img class="brand-logo" src="assets/logo_cat.png" alt="" />
+      <strong class="brand-title">지설이의 타로</strong>
+      <span class="brand-divider" aria-hidden="true"></span>
+      <span class="brand-tagline">고양이가 전하는 특별한 타로 운세</span>
+    </div>
+    <nav class="nav" aria-label="주요 메뉴">
+      <a class="is-active" href="#">
+        <img class="nav-icon" src="assets/icon/icon_home.png" alt="" />
+        <span class="label">홈</span>
+      </a>
+      <a href="#">
+        <img class="nav-icon" src="assets/icon/icon_record.png" alt="" />
+        <span class="label">타로 기록</span>
+      </a>
+      <a href="#">
+        <span class="label">소개</span>
+      </a>
+      <a href="#" aria-label="발자국">
+        <img class="nav-icon" src="assets/icon/icon_paw.png" alt="" />
+      </a>
+    </nav>
+  </header>
+
+  <main class="layout">
+    <section class="stage" aria-label="타로 뽑기">
+      <img class="stage-bg" src="assets/bg_room.png" alt="" />
+      <div class="stage-veil" aria-hidden="true"></div>
+
+      <div class="stage-content">
+        <p class="speech">오늘의 운세를 뽑아볼까냥?</p>
+
+        <div>
+          <h1 class="hero-title">
+            <span class="sparkle">✦</span> 지설이의 타로 <span class="sparkle">✦</span>
+          </h1>
+          <p class="hero-sub">고양이 타로가 알려주는 오늘의 운세</p>
+        </div>
+
+        <img class="wizard-cat" src="assets/wizard_cat.png" alt="마법사 고양이" />
+
+        <div class="cards" id="cards" aria-label="타로 카드">
+          <button class="card" type="button" aria-label="카드 1">
+            <img src="assets/card_back.png" alt="" />
+          </button>
+          <button class="card" type="button" aria-label="카드 2">
+            <img src="assets/card_back.png" alt="" />
+          </button>
+          <button class="card" type="button" aria-label="카드 3">
+            <img src="assets/card_back.png" alt="" />
+          </button>
+          <button class="card" type="button" aria-label="카드 4">
+            <img src="assets/card_back.png" alt="" />
+          </button>
+          <button class="card" type="button" aria-label="카드 5">
+            <img src="assets/card_back.png" alt="" />
+          </button>
+        </div>
+
+        <button class="draw-btn" id="draw-btn" type="button">
+          <img src="assets/icon/icon_paw.png" alt="" />
+          카드 뽑기
+          <img src="assets/icon/icon_paw.png" alt="" />
+        </button>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <section class="panel">
+        <h2 class="panel-title">
+          <img class="icon" src="assets/logo_cat.png" alt="" />
+          오늘의 운세는?
+          <span class="spark" aria-hidden="true">✦</span>
+        </h2>
+        <div class="feature-list">
+          <article class="feature">
+            <img class="feature-icon" src="assets/icon/icon_moon.png" alt="" />
+            <p>
+              <strong>타로 카드</strong>
+              고양이가 직접 고른 카드를 통해 오늘의 운세를 알려드려요.
+            </p>
+          </article>
+          <article class="feature">
+            <img class="feature-icon" src="assets/icon/icon_sparkle.png" alt="" />
+            <p>
+              <strong>운세 항목</strong>
+              종합운, 연애운, 금전운, 학업운, 건강운 등 다양한 항목을 확인할 수 있어요.
+            </p>
+          </article>
+          <article class="feature">
+            <img class="feature-icon" src="assets/icon/icon_paw_circle.png" alt="" />
+            <p>
+              <strong>행운의 팁</strong>
+              오늘의 행운 아이템, 색상, 숫자까지 함께 알려드려요.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel quote">
+        <img class="quote-cat" src="assets/logo_cat.png" alt="" />
+        <p>좋은 일은 언제나,<br />준비된 사람에게 찾아온다냥.</p>
+      </section>
+    </aside>
+  </main>
+
+  <div class="draw-modal" id="draw-modal" aria-hidden="true">
+    <div class="draw-modal-backdrop" data-close-modal></div>
+    <div class="draw-modal-panel" role="dialog" aria-modal="true" aria-labelledby="draw-modal-title">
+      <h2 class="draw-modal-title" id="draw-modal-title">카드를 골라주세요</h2>
+      <p class="draw-modal-sub">뒷면 카드 중 하나를 누르면 앞면이 공개됩니다.</p>
+      <div class="pick-cards" id="pick-cards"></div>
+      <button class="draw-modal-close" type="button" data-close-modal>닫기</button>
+    </div>
+  </div>
+
+  <div class="result-view" id="result-view" aria-hidden="true">
+    <div class="result-panel">
+      <div class="result-card-col">
+        <img class="result-card-img" id="result-card-img" alt="" />
+        <div class="result-card-meta">
+          <span class="result-orientation" id="result-orientation">정방향</span>
+          <h2 class="result-card-name" id="result-card-name"></h2>
+          <p class="result-card-en" id="result-card-en"></p>
+        </div>
+      </div>
+      <div class="result-meaning-col">
+        <h3 class="result-title" id="result-title"></h3>
+        <div class="result-keywords" id="result-keywords"></div>
+        <p class="result-description" id="result-description"></p>
+        <p class="result-cat" id="result-cat"></p>
+        <div class="result-actions">
+          <button class="result-btn primary" id="result-again" type="button">다시 뽑기</button>
+          <button class="result-btn" id="result-home" type="button">홈으로</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const TAROT_CARDS = [
+      { id: 0, file: "0.TheFool.png", name: "The Fool", ko: "바보" },
+      { id: 6, file: "6.TheLovers.png", name: "The Lovers", ko: "연인" },
+      { id: 7, file: "7.TheChariot.png", name: "The Chariot", ko: "전차" },
+      { id: 9, file: "9.TheHermit.png", name: "The Hermit", ko: "은둔자" },
+      { id: 10, file: "10.WheelOfFortune.png", name: "Wheel Of Fortune", ko: "운명의 수레바퀴" },
+      { id: 13, file: "13.Death.png", name: "Death", ko: "죽음" },
+      { id: 15, file: "15.TheDevil.png", name: "The Devil", ko: "악마" },
+      { id: 16, file: "16.TheTower.png", name: "The Tower", ko: "탑" },
+      { id: 19, file: "19.TheSun.png", name: "The Sun", ko: "태양" },
+      { id: 21, file: "21.TheWorld.png", name: "The World", ko: "세계" },
+    ];
+
+    function shuffle(list) {
+      const next = list.slice();
+      for (let i = next.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [next[i], next[j]] = [next[j], next[i]];
+      }
+      return next;
+    }
+
+    const drawBtn = document.getElementById("draw-btn");
+    const modal = document.getElementById("draw-modal");
+    const pickCards = document.getElementById("pick-cards");
+    const resultView = document.getElementById("result-view");
+    const resultCardImg = document.getElementById("result-card-img");
+    const resultOrientation = document.getElementById("result-orientation");
+    const resultCardName = document.getElementById("result-card-name");
+    const resultCardEn = document.getElementById("result-card-en");
+    const resultTitle = document.getElementById("result-title");
+    const resultKeywords = document.getElementById("result-keywords");
+    const resultDescription = document.getElementById("result-description");
+    const resultCat = document.getElementById("result-cat");
+
+    let hasPicked = false;
+
+    function openModal() {
+      const deck = shuffle(TAROT_CARDS);
+      hasPicked = false;
+
+      pickCards.innerHTML = "";
+      deck.forEach((card, index) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "pick-card";
+        btn.setAttribute("aria-label", "카드 " + (index + 1));
+        btn.dataset.id = String(card.id);
+        btn.dataset.front = "assets/Card/" + card.file;
+        btn.dataset.name = card.name;
+        btn.dataset.ko = card.ko;
+
+        const img = document.createElement("img");
+        img.src = "assets/card_back.png";
+        img.alt = "";
+        btn.appendChild(img);
+        pickCards.appendChild(btn);
+      });
+
+      modal.classList.add("is-open");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      if (!resultView.classList.contains("is-open")) {
+        document.body.style.overflow = "";
+      }
+    }
+
+    function fillResult(card, orientation) {
+      const meaningRoot = (typeof tarotMessages !== "undefined" && tarotMessages[card.id]) || null;
+      const meaning = meaningRoot ? meaningRoot[orientation] : null;
+      const isReversed = orientation === "reversed";
+
+      resultCardImg.src = "assets/Card/" + card.file;
+      resultCardImg.alt = card.ko;
+      resultCardImg.classList.toggle("is-reversed", isReversed);
+      resultOrientation.textContent = isReversed ? "역방향" : "정방향";
+      resultCardName.textContent = card.ko;
+      resultCardEn.textContent = card.name;
+
+      if (meaning) {
+        resultTitle.textContent = meaning.title;
+        resultDescription.textContent = meaning.description;
+        resultCat.textContent = meaning.catMessage;
+        resultKeywords.innerHTML = (meaning.keywords || [])
+          .map((word) => "<span>" + word + "</span>")
+          .join("");
+      } else {
+        resultTitle.textContent = "카드 해석을 불러오지 못했어요.";
+        resultDescription.textContent = "TarotCardMeanings 데이터를 확인해주세요.";
+        resultCat.textContent = "";
+        resultKeywords.innerHTML = "";
+      }
+    }
+
+    function getResultCardTargetRect() {
+      const panel = resultView.querySelector(".result-panel");
+      const panelRect = panel.getBoundingClientRect();
+      const width = Math.min(260, panelRect.width * 0.3);
+      const height = width * 1.5;
+      const left = panelRect.left + Math.max(24, (panelRect.width * 0.38 - width) / 2);
+      const top = panelRect.top + (panelRect.height - height) / 2 - 24;
+      return { left, top, width, height };
+    }
+
+    function showResultWithFlight(fromEl, card, orientation) {
+      const start = fromEl.getBoundingClientRect();
+      const fly = document.createElement("div");
+      fly.className = "fly-card" + (orientation === "reversed" ? " is-reversed" : "");
+      fly.style.left = start.left + "px";
+      fly.style.top = start.top + "px";
+      fly.style.width = start.width + "px";
+      fly.style.height = start.height + "px";
+
+      const flyImg = document.createElement("img");
+      flyImg.src = "assets/Card/" + card.file;
+      flyImg.alt = card.ko;
+      fly.appendChild(flyImg);
+      document.body.appendChild(fly);
+
+      fillResult(card, orientation);
+      resultView.classList.add("is-open");
+      resultView.classList.remove("is-ready");
+      resultView.setAttribute("aria-hidden", "false");
+      closeModal();
+
+      const target = getResultCardTargetRect();
+
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          fly.style.left = target.left + "px";
+          fly.style.top = target.top + "px";
+          fly.style.width = target.width + "px";
+          fly.style.height = target.height + "px";
+        });
+      });
+
+      window.setTimeout(() => {
+        resultView.classList.add("is-ready");
+        fly.style.opacity = "0";
+        window.setTimeout(() => fly.remove(), 280);
+      }, 850);
+    }
+
+    drawBtn.addEventListener("click", openModal);
+
+    pickCards.addEventListener("click", (event) => {
+      const cardBtn = event.target.closest(".pick-card");
+      if (!cardBtn || hasPicked || cardBtn.classList.contains("is-flipped")) return;
+
+      hasPicked = true;
+      const cardId = Number(cardBtn.dataset.id);
+      const card = TAROT_CARDS.find((item) => item.id === cardId);
+      const orientation = Math.random() < 0.5 ? "upright" : "reversed";
+      const img = cardBtn.querySelector("img");
+
+      cardBtn.classList.add("is-flipping");
+
+      pickCards.querySelectorAll(".pick-card").forEach((other) => {
+        if (other !== cardBtn) {
+          other.classList.add("is-dimmed");
+          other.disabled = true;
+        }
+      });
+
+      window.setTimeout(() => {
+        img.src = cardBtn.dataset.front;
+        img.alt = cardBtn.dataset.ko || "";
+        cardBtn.classList.remove("is-flipping");
+        cardBtn.classList.add("is-flipped");
+        if (orientation === "reversed") {
+          img.style.transform = "rotate(180deg)";
+        }
+
+        window.setTimeout(() => {
+          if (card) showResultWithFlight(cardBtn, card, orientation);
+        }, 450);
+      }, 280);
+    });
+
+    modal.addEventListener("click", (event) => {
+      if (event.target.closest("[data-close-modal]")) {
+        closeModal();
+      }
+    });
+
+    document.getElementById("result-again").addEventListener("click", () => {
+      resultView.classList.remove("is-open", "is-ready");
+      resultView.setAttribute("aria-hidden", "true");
+      openModal();
+    });
+
+    document.getElementById("result-home").addEventListener("click", () => {
+      resultView.classList.remove("is-open", "is-ready");
+      resultView.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      if (resultView.classList.contains("is-open")) {
+        resultView.classList.remove("is-open", "is-ready");
+        resultView.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+        return;
+      }
+      if (modal.classList.contains("is-open")) {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1148,6 +1148,7 @@
         <p class="result-cat" id="result-cat"></p>
         <div class="result-actions">
           <button class="result-btn primary" id="result-share" type="button">결과 공유</button>
+          <button class="result-btn primary" id="result-draw-too" type="button" hidden>나도 뽑기</button>
           <button class="result-btn" id="result-home" type="button">홈으로</button>
         </div>
       </div>
@@ -1318,6 +1319,8 @@
     const resultDescription = document.getElementById("result-description");
     const resultCat = document.getElementById("result-cat");
     const resultShare = document.getElementById("result-share");
+    const resultDrawToo = document.getElementById("result-draw-too");
+    const resultHome = document.getElementById("result-home");
     const toastEl = document.getElementById("toast");
 
     let hasPicked = false;
@@ -1424,6 +1427,12 @@
       return TAROT_CARDS.find(function (item) { return item.id === cardId; }) || null;
     }
 
+    function syncResultActions(isOwn) {
+      resultShare.hidden = !isOwn;
+      resultHome.hidden = !isOwn;
+      resultDrawToo.hidden = isOwn;
+    }
+
     function closeResult() {
       resultView.classList.remove("is-open", "is-ready");
       resultView.setAttribute("aria-hidden", "true");
@@ -1448,6 +1457,7 @@
       resultView.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
       replaceShareUrl(card.id, orientation, currentResult.date);
+      syncResultActions(currentResult.isOwn);
     }
 
     function openModal() {
@@ -1641,7 +1651,7 @@
     });
 
     resultShare.addEventListener("click", async () => {
-      if (!currentResult) return;
+      if (!currentResult || !currentResult.isOwn) return;
       const url = shareUrlFor(currentResult.cardId, currentResult.orientation, currentResult.date);
       const shareData = {
         title: "설이의 타로",
@@ -1671,7 +1681,11 @@
       }
     });
 
-    document.getElementById("result-home").addEventListener("click", () => {
+    resultDrawToo.addEventListener("click", () => {
+      closeResult();
+    });
+
+    resultHome.addEventListener("click", () => {
       closeResult();
     });
 

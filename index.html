@@ -817,6 +817,31 @@
       filter: brightness(1.05);
     }
 
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: max(20px, env(safe-area-inset-bottom, 0px));
+      transform: translateX(-50%) translateY(12px);
+      z-index: 3000;
+      max-width: min(92vw, 440px);
+      padding: 12px 18px;
+      border-radius: 999px;
+      background: rgba(28, 16, 48, 0.94);
+      border: 1px solid rgba(240, 200, 90, 0.45);
+      color: #f7f2ff;
+      font-size: 14px;
+      line-height: 1.4;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .toast.is-show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
     .fly-card {
       position: fixed;
       z-index: 1200;
@@ -1018,7 +1043,7 @@
       <div class="stage-veil" aria-hidden="true"></div>
 
       <div class="stage-content">
-        <p class="speech">오늘의 운세를 뽑아볼까냥?</p>
+        <p class="speech" id="home-speech">오늘의 운세를 뽑아볼까냥?</p>
 
         <div>
           <h1 class="hero-title">
@@ -1049,7 +1074,7 @@
 
         <button class="draw-btn" id="draw-btn" type="button">
           <img src="assets/icon/icon_paw.png" alt="" />
-          카드 뽑기
+          <span id="draw-btn-label">카드 뽑기</span>
           <img src="assets/icon/icon_paw.png" alt="" />
         </button>
       </div>
@@ -1122,13 +1147,15 @@
         <p class="result-description" id="result-description"></p>
         <p class="result-cat" id="result-cat"></p>
         <div class="result-actions">
-          <button class="result-btn primary" id="result-again" type="button">다시 뽑기</button>
+          <button class="result-btn primary" id="result-share" type="button">결과 공유</button>
           <button class="result-btn" id="result-home" type="button">홈으로</button>
         </div>
       </div>
       </div>
     </div>
   </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
     const TAROT_CARDS = [
@@ -1274,7 +1301,10 @@
       return { item, color, numbers: String(number) };
     }
 
+    const STORAGE_KEY = "jiseolsTarot.today";
     const drawBtn = document.getElementById("draw-btn");
+    const drawBtnLabel = document.getElementById("draw-btn-label");
+    const homeSpeech = document.getElementById("home-speech");
     const modal = document.getElementById("draw-modal");
     const pickCards = document.getElementById("pick-cards");
     const resultView = document.getElementById("result-view");
@@ -1287,8 +1317,138 @@
     const resultFortunes = document.getElementById("result-fortunes");
     const resultDescription = document.getElementById("result-description");
     const resultCat = document.getElementById("result-cat");
+    const resultShare = document.getElementById("result-share");
+    const toastEl = document.getElementById("toast");
 
     let hasPicked = false;
+    let currentResult = null;
+    let toastTimer = 0;
+
+    function todayStamp() {
+      const now = new Date();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const day = String(now.getDate()).padStart(2, "0");
+      return String(now.getFullYear()) + month + day;
+    }
+
+    function encodeShareToken(cardId, orientation, date) {
+      const dir = orientation === "reversed" ? "r" : "u";
+      return cardId + "." + dir + "." + date;
+    }
+
+    function parseShareToken(token) {
+      if (!token) return null;
+      const parts = String(token).split(".");
+      if (parts.length !== 3) return null;
+      const cardId = Number(parts[0]);
+      const orientation = parts[1] === "r" ? "reversed" : parts[1] === "u" ? "upright" : null;
+      const date = parts[2];
+      if (!orientation || !/^\d{8}$/.test(date)) return null;
+      if (!TAROT_CARDS.some(function (item) { return item.id === cardId; })) return null;
+      return { cardId: cardId, orientation: orientation, date: date };
+    }
+
+    function readShareFromUrl() {
+      try {
+        return parseShareToken(new URL(window.location.href).searchParams.get("s"));
+      } catch (err) {
+        return null;
+      }
+    }
+
+    function shareUrlFor(cardId, orientation, date) {
+      const url = new URL(window.location.href);
+      url.search = "";
+      url.hash = "";
+      url.searchParams.set("s", encodeShareToken(cardId, orientation, date));
+      return url.toString();
+    }
+
+    function replaceShareUrl(cardId, orientation, date) {
+      const next = shareUrlFor(cardId, orientation, date);
+      window.history.replaceState(null, "", next);
+    }
+
+    function clearShareUrl() {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("s");
+      const search = url.searchParams.toString();
+      window.history.replaceState(null, "", url.pathname + (search ? "?" + search : "") + url.hash);
+    }
+
+    function loadTodayDraw() {
+      try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const saved = JSON.parse(raw);
+        if (!saved || saved.date !== todayStamp()) return null;
+        if (!TAROT_CARDS.some(function (item) { return item.id === saved.cardId; })) return null;
+        if (saved.orientation !== "upright" && saved.orientation !== "reversed") return null;
+        return saved;
+      } catch (err) {
+        return null;
+      }
+    }
+
+    function saveTodayDraw(cardId, orientation) {
+      const payload = {
+        date: todayStamp(),
+        cardId: cardId,
+        orientation: orientation,
+      };
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      return payload;
+    }
+
+    function showToast(message) {
+      toastEl.textContent = message;
+      toastEl.classList.add("is-show");
+      window.clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(function () {
+        toastEl.classList.remove("is-show");
+      }, 2400);
+    }
+
+    function syncHomeDrawState() {
+      const saved = loadTodayDraw();
+      if (saved) {
+        drawBtnLabel.textContent = "오늘의 결과";
+        homeSpeech.textContent = "오늘은 이미 운세를 봤다냥!";
+      } else {
+        drawBtnLabel.textContent = "카드 뽑기";
+        homeSpeech.textContent = "오늘의 운세를 뽑아볼까냥?";
+      }
+    }
+
+    function findCard(cardId) {
+      return TAROT_CARDS.find(function (item) { return item.id === cardId; }) || null;
+    }
+
+    function closeResult() {
+      resultView.classList.remove("is-open", "is-ready");
+      resultView.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      currentResult = null;
+      clearShareUrl();
+      syncHomeDrawState();
+    }
+
+    function showResult(card, orientation, options) {
+      const opts = options || {};
+      fillResult(card, orientation);
+      currentResult = {
+        cardId: card.id,
+        orientation: orientation,
+        date: opts.date || todayStamp(),
+        isOwn: Boolean(opts.isOwn),
+      };
+      resultView.classList.add("is-open");
+      if (opts.ready) resultView.classList.add("is-ready");
+      else resultView.classList.remove("is-ready");
+      resultView.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      replaceShareUrl(card.id, orientation, currentResult.date);
+    }
 
     function openModal() {
       const deck = shuffle(TAROT_CARDS);
@@ -1406,10 +1566,8 @@
       fly.appendChild(flyImg);
       document.body.appendChild(fly);
 
-      fillResult(card, orientation);
-      resultView.classList.add("is-open");
-      resultView.classList.remove("is-ready");
-      resultView.setAttribute("aria-hidden", "false");
+      saveTodayDraw(card.id, orientation);
+      showResult(card, orientation, { isOwn: true, date: todayStamp(), ready: false });
       closeModal();
 
       const target = getResultCardTargetRect();
@@ -1430,7 +1588,17 @@
       }, 850);
     }
 
-    drawBtn.addEventListener("click", openModal);
+    drawBtn.addEventListener("click", () => {
+      const saved = loadTodayDraw();
+      if (saved) {
+        const card = findCard(saved.cardId);
+        if (card) {
+          showResult(card, saved.orientation, { isOwn: true, date: saved.date, ready: true });
+          return;
+        }
+      }
+      openModal();
+    });
 
     pickCards.addEventListener("click", (event) => {
       const cardBtn = event.target.closest(".pick-card");
@@ -1472,30 +1640,83 @@
       }
     });
 
-    document.getElementById("result-again").addEventListener("click", () => {
-      resultView.classList.remove("is-open", "is-ready");
-      resultView.setAttribute("aria-hidden", "true");
-      openModal();
+    resultShare.addEventListener("click", async () => {
+      if (!currentResult) return;
+      const url = shareUrlFor(currentResult.cardId, currentResult.orientation, currentResult.date);
+      const shareData = {
+        title: "설이의 타로",
+        text: "오늘의 타로 운세를 봐달라냥!",
+        url: url,
+      };
+
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+          return;
+        }
+      } catch (err) {
+        if (err && err.name === "AbortError") return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(url);
+        const prev = resultShare.textContent;
+        resultShare.textContent = "복사했어요";
+        showToast("결과 링크를 복사했다냥. 오늘만 볼 수 있다냥!");
+        window.setTimeout(function () {
+          resultShare.textContent = prev;
+        }, 1600);
+      } catch (err) {
+        window.prompt("이 링크를 복사해서 공유해 주세요.", url);
+      }
     });
 
     document.getElementById("result-home").addEventListener("click", () => {
-      resultView.classList.remove("is-open", "is-ready");
-      resultView.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
+      closeResult();
     });
 
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
       if (resultView.classList.contains("is-open")) {
-        resultView.classList.remove("is-open", "is-ready");
-        resultView.setAttribute("aria-hidden", "true");
-        document.body.style.overflow = "";
+        closeResult();
         return;
       }
       if (modal.classList.contains("is-open")) {
         closeModal();
       }
     });
+
+    (function boot() {
+      syncHomeDrawState();
+      const shared = readShareFromUrl();
+      if (!shared) return;
+
+      if (shared.date !== todayStamp()) {
+        clearShareUrl();
+        showToast("이 공유 링크는 오늘만 볼 수 있다냥.");
+        return;
+      }
+
+      const card = findCard(shared.cardId);
+      if (!card) {
+        clearShareUrl();
+        showToast("공유된 운세를 찾을 수 없다냥.");
+        return;
+      }
+
+      const saved = loadTodayDraw();
+      const isOwn = Boolean(
+        saved &&
+        saved.cardId === shared.cardId &&
+        saved.orientation === shared.orientation
+      );
+
+      showResult(card, shared.orientation, {
+        isOwn: isOwn,
+        date: shared.date,
+        ready: true,
+      });
+    })();
   </script>
 </body>
 </html>

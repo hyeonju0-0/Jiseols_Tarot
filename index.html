@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>설이의 타로</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link href="https://cdn.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css" rel="stylesheet" />
@@ -159,7 +159,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
-      padding: clamp(10px, 1.6vh, 16px) 16px clamp(18px, 2.6vh, 28px);
+      padding: clamp(10px, 1.6vh, 16px) 16px calc(clamp(18px, 2.6vh, 28px) + env(safe-area-inset-bottom, 0px));
     }
 
     .stage-bg {
@@ -248,6 +248,8 @@
       object-fit: contain;
       display: block;
       margin: -6px 0 0;
+      min-height: 0;
+      flex-shrink: 1;
       mix-blend-mode: lighten;
       filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.5));
       animation: bob 3.2s ease-in-out infinite;
@@ -290,6 +292,7 @@
       justify-content: center;
       gap: 12px;
       min-width: 300px;
+      flex-shrink: 0;
       padding: clamp(12px, 1.6vh, 18px) 42px;
       border-radius: 999px;
       background: linear-gradient(180deg, #4a2f86 0%, #2d1a58 100%);
@@ -585,11 +588,13 @@
     .result-panel-inner {
       min-width: 0;
       min-height: 0;
+      width: 100%;
+      height: 100%;
       display: grid;
-      grid-template-columns: minmax(0, 34%) minmax(0, 1fr);
-      gap: clamp(8px, 1.5vh, 20px);
+      grid-template-columns: minmax(0, 36%) minmax(0, 1fr);
+      gap: clamp(10px, 2%, 24px);
       align-items: stretch;
-      padding: clamp(18px, 5vh, 48px) clamp(20px, 5vw, 64px) clamp(14px, 4vh, 36px);
+      padding: 11% 18% 11% 11%;
       box-sizing: border-box;
     }
 
@@ -611,9 +616,9 @@
     }
 
     .result-card-img {
-      width: min(100%, 16vw, 20vh);
+      width: min(100%, 22vw, 32vh);
       height: auto;
-      max-height: 32vh;
+      max-height: 48vh;
       aspect-ratio: 2 / 3;
       object-fit: cover;
       border-radius: 10px;
@@ -645,36 +650,40 @@
     .result-orientation {
       display: inline-flex;
       align-self: center;
-      padding: 3px 10px;
+      padding: 4px 12px;
       border-radius: 999px;
       border: 1px solid rgba(90, 60, 30, 0.4);
       background: rgba(255, 245, 220, 0.55);
       color: #6a4a1e;
-      font-size: clamp(10px, 1.2vh, 13px);
+      font-size: clamp(12px, 1.5vh, 16px);
     }
 
     .result-card-name {
-      font-size: clamp(13px, 2.1vh, 26px);
+      font-size: clamp(16px, 2.6vh, 32px);
       color: #3b2a16;
     }
 
     .result-card-en {
       color: #5d4630;
-      font-size: clamp(10px, 1.2vh, 13px);
+      font-size: clamp(12px, 1.5vh, 16px);
     }
 
     .result-meaning-col {
       display: flex;
       flex-direction: column;
-      gap: clamp(4px, 0.8vh, 8px);
+      justify-content: safe center;
+      gap: clamp(6px, 1vh, 12px);
       min-width: 0;
       min-height: 0;
       max-height: 100%;
+      max-width: 100%;
       text-align: left;
       opacity: 0;
       transform: translateX(24px);
       transition: opacity 0.45s ease 0.15s, transform 0.45s ease 0.15s;
       overflow: auto;
+      overflow-wrap: break-word;
+      word-break: break-word;
     }
 
     .result-view.is-ready .result-meaning-col {
@@ -683,11 +692,12 @@
     }
 
     .result-title {
-      font-size: clamp(12px, 1.7vh, 22px);
+      font-size: clamp(16px, 2.4vh, 28px);
       line-height: 1.35;
       color: #3b2a16;
       text-shadow: 0 1px 0 rgba(255, 245, 220, 0.5);
       flex-shrink: 0;
+      overflow-wrap: break-word;
     }
 
     .result-lucky {
@@ -700,18 +710,18 @@
     .result-lucky > span {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 3px 9px;
+      gap: 6px;
+      padding: 4px 11px;
       border-radius: 999px;
       background: rgba(90, 60, 30, 0.12);
       border: 1px solid rgba(90, 60, 30, 0.28);
-      font-size: clamp(10px, 1.15vh, 12px);
+      font-size: clamp(12px, 1.5vh, 16px);
       color: #4a3520;
     }
 
     .lucky-swatch {
-      width: 10px;
-      height: 10px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       border: 1px solid rgba(90, 60, 30, 0.4);
       flex-shrink: 0;
@@ -723,8 +733,7 @@
       flex-direction: column;
       gap: clamp(2px, 0.5vh, 6px);
       min-height: 0;
-      flex: 1;
-      overflow: auto;
+      flex: 0 0 auto;
     }
 
     .fortune-row {
@@ -736,13 +745,13 @@
 
     .fortune-row .fortune-label {
       color: #3b2a16;
-      font-size: clamp(10px, 1.2vh, 13px);
+      font-size: clamp(13px, 1.7vh, 18px);
       font-weight: 700;
     }
 
     .fortune-row .fortune-stars {
       color: #8a6a30;
-      font-size: clamp(10px, 1.15vh, 12px);
+      font-size: clamp(12px, 1.5vh, 16px);
       letter-spacing: -1px;
       white-space: nowrap;
     }
@@ -750,20 +759,21 @@
     .fortune-row .fortune-msg {
       min-width: 0;
       color: #5d4630;
-      font-size: clamp(10px, 1.2vh, 13px);
-      line-height: 1.35;
+      font-size: clamp(13px, 1.7vh, 18px);
+      line-height: 1.4;
+      overflow-wrap: break-word;
     }
 
     .result-description {
       color: #3f2f1c;
-      font-size: clamp(11px, 1.25vh, 15px);
+      font-size: clamp(12px, 1.5vh, 16px);
       line-height: 1.45;
       margin: 0;
       white-space: pre-wrap;
-      overflow: auto;
-      flex: 0 1 auto;
-      max-height: 26%;
+      overflow: visible;
+      flex: 0 0 auto;
       min-height: 0;
+      overflow-wrap: break-word;
     }
 
     .result-cat {
@@ -773,8 +783,8 @@
       background: rgba(120, 70, 30, 0.12);
       border: 1px solid rgba(120, 70, 30, 0.28);
       color: #5a3a14;
-      font-size: clamp(10px, 1.2vh, 13px);
-      line-height: 1.4;
+      font-size: clamp(13px, 1.7vh, 18px);
+      line-height: 1.45;
       flex-shrink: 0;
     }
 
@@ -789,12 +799,12 @@
 
     .result-btn {
       min-width: 0;
-      padding: 6px 14px;
+      padding: 8px 16px;
       border-radius: 999px;
       border: 2px solid rgba(90, 60, 30, 0.45);
       background: rgba(255, 245, 220, 0.72);
       color: #3b2a16;
-      font-size: clamp(11px, 1.2vh, 14px);
+      font-size: clamp(13px, 1.6vh, 18px);
     }
 
     .result-btn.primary {
@@ -883,6 +893,7 @@
       .layout {
         grid-template-columns: 1fr;
         overflow: visible;
+        height: auto;
       }
 
       .brand-tagline,
@@ -892,7 +903,34 @@
 
       .stage {
         min-height: calc(100dvh - var(--header-h) - 32px);
-        height: calc(100dvh - var(--header-h) - 32px);
+        height: auto;
+        overflow: visible;
+      }
+
+      .stage-content {
+        max-height: none;
+        width: 100%;
+      }
+
+      .cards {
+        gap: 8px;
+        flex-wrap: nowrap;
+        overflow: visible;
+      }
+
+      .card {
+        width: clamp(52px, 14vw, 72px);
+        height: clamp(78px, 21vw, 108px);
+        flex-shrink: 0;
+      }
+
+      .wizard-cat {
+        max-width: min(240px, 52vw);
+        max-height: min(200px, 22dvh);
+      }
+
+      .hero-title {
+        font-size: clamp(22px, 6vw, 36px);
       }
 
       .pick-cards {
@@ -900,11 +938,16 @@
       }
 
       .result-panel-inner {
-        grid-template-columns: minmax(0, 32%) minmax(0, 1fr);
+        grid-template-columns: minmax(0, 36%) minmax(0, 1fr);
+        padding: 14% 19% 14% 11%;
       }
     }
 
     @media (max-width: 560px) {
+      :root {
+        --header-h: 72px;
+      }
+
       .site-header {
         height: 72px;
         padding: 0 14px;
@@ -927,19 +970,15 @@
         display: none;
       }
 
-      .card {
-        width: clamp(88px, 14dvh, 100px);
-        height: clamp(132px, 21dvh, 150px);
-      }
-
       .wizard-cat {
-        max-width: min(280px, 72vw);
-        max-height: min(280px, 32dvh);
+        max-width: min(200px, 58vw);
+        max-height: min(160px, 20dvh);
       }
 
       .draw-btn {
-        min-width: 240px;
-        padding: 14px 28px;
+        min-width: 0;
+        width: min(100%, 280px);
+        padding: 14px 24px;
         font-size: 17px;
       }
     }

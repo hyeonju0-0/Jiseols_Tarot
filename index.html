@@ -855,8 +855,9 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* ===== About modal ===== */
-    .about-modal {
+    /* ===== About / record modal ===== */
+    .about-modal,
+    .record-modal {
       position: fixed;
       inset: 0;
       z-index: 1300;
@@ -866,18 +867,21 @@
       padding: 3vh 2vw;
     }
 
-    .about-modal.is-open {
+    .about-modal.is-open,
+    .record-modal.is-open {
       display: flex;
       overscroll-behavior: none;
     }
 
-    .about-modal-backdrop {
+    .about-modal-backdrop,
+    .record-modal-backdrop {
       position: absolute;
       inset: 0;
       background: rgba(6, 4, 14, 0.75);
     }
 
-    .about-modal-panel {
+    .about-modal-panel,
+    .record-modal-panel {
       --box-ratio: 1536 / 1024;
       position: relative;
       z-index: 1;
@@ -897,7 +901,8 @@
       container-type: size;
     }
 
-    .about-modal-panel:focus {
+    .about-modal-panel:focus,
+    .record-modal-panel:focus {
       outline: none;
     }
 
@@ -1001,6 +1006,66 @@
       vertical-align: -0.2em;
       border-radius: 4px;
       object-fit: cover;
+    }
+
+    .record-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .record-empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #5d4630;
+      padding: 28px 8px;
+      margin-bottom: 0;
+    }
+
+    .record-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(255, 245, 220, 0.38);
+      border: 1px solid rgba(90, 60, 30, 0.22);
+      color: #3b2a16;
+      text-align: left;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+    .record-item:hover {
+      background: rgba(255, 248, 230, 0.7);
+      transform: translateY(-1px);
+    }
+
+    .record-thumb {
+      width: 44px;
+      height: 66px;
+      object-fit: cover;
+      border-radius: 6px;
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
+      background: #2a1a4a;
+    }
+
+    .record-thumb.is-reversed {
+      transform: rotate(180deg);
+    }
+
+    .record-item-ko {
+      display: block;
+      font-size: clamp(14px, 2.4cqh, 17px);
+    }
+
+    .record-item-sub {
+      display: block;
+      margin-top: 3px;
+      font-size: clamp(11px, 2cqh, 13px);
+      color: #5d4630;
+      line-height: 1.45;
     }
 
     .fly-card {
@@ -1177,7 +1242,8 @@
           url("assets/card_box2.png") center center / 100% 100% no-repeat;
       }
 
-      .about-modal-panel {
+      .about-modal-panel,
+      .record-modal-panel {
         --box-ratio: 2 / 3;
         width: min(92vw, calc(88dvh * 2 / 3), 430px);
         height: auto;
@@ -1191,6 +1257,10 @@
 
       .about-inner h1 {
         font-size: clamp(20px, 4.6cqh, 28px);
+      }
+
+      .record-list {
+        grid-template-columns: 1fr;
       }
 
       .about-lead,
@@ -1297,7 +1367,7 @@
         <img class="nav-icon" src="assets/icon/icon_home.png" alt="" />
         <span class="label">홈</span>
       </a>
-      <a href="#">
+      <a href="#record" id="nav-record">
         <img class="nav-icon" src="assets/icon/icon_record.png" alt="" />
         <span class="label">타로 기록</span>
       </a>
@@ -1520,6 +1590,20 @@
     </div>
   </div>
 
+  <div class="record-modal" id="record-modal" aria-hidden="true">
+    <div class="record-modal-backdrop" data-close-record></div>
+    <div class="record-modal-panel" role="dialog" aria-modal="true" aria-labelledby="record-title" tabindex="-1">
+      <div class="about-scroll">
+        <div class="about-inner">
+          <h1 id="record-title">타로 기록</h1>
+          <p class="about-lead">이 브라우저에 남은 설이의 카드들</p>
+          <div class="record-list" id="record-list"></div>
+        </div>
+      </div>
+      <button class="draw-modal-close" type="button" data-close-record>닫기</button>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
@@ -1667,6 +1751,7 @@
     }
 
     const STORAGE_KEY = "jiseolsTarot.today";
+    const HISTORY_KEY = "jiseolsTarot.history";
     const drawBtn = document.getElementById("draw-btn");
     const drawBtnLabel = document.getElementById("draw-btn-label");
     const homeSpeech = document.getElementById("home-speech");
@@ -1688,7 +1773,11 @@
     const toastEl = document.getElementById("toast");
     const aboutModal = document.getElementById("about-modal");
     const aboutPanel = aboutModal.querySelector(".about-modal-panel");
+    const recordModal = document.getElementById("record-modal");
+    const recordPanel = recordModal.querySelector(".record-modal-panel");
+    const recordList = document.getElementById("record-list");
     const navHome = document.getElementById("nav-home");
+    const navRecord = document.getElementById("nav-record");
     const navAbout = document.getElementById("nav-about");
 
     let hasPicked = false;
@@ -1768,7 +1857,88 @@
         orientation: orientation,
       };
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      saveHistoryEntry(payload.date, cardId, orientation);
       return payload;
+    }
+
+    function isValidHistoryEntry(item) {
+      if (!item || !/^\d{8}$/.test(item.date)) return false;
+      if (item.orientation !== "upright" && item.orientation !== "reversed") return false;
+      return TAROT_CARDS.some(function (card) { return card.id === item.cardId; });
+    }
+
+    function loadHistory() {
+      try {
+        const raw = window.localStorage.getItem(HISTORY_KEY);
+        if (!raw) return [];
+        const list = JSON.parse(raw);
+        if (!Array.isArray(list)) return [];
+        return list
+          .filter(isValidHistoryEntry)
+          .sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+      } catch (err) {
+        return [];
+      }
+    }
+
+    function saveHistoryEntry(date, cardId, orientation) {
+      if (!isValidHistoryEntry({ date: date, cardId: cardId, orientation: orientation })) return;
+      const list = loadHistory().filter(function (item) { return item.date !== date; });
+      list.unshift({ date: date, cardId: cardId, orientation: orientation });
+      window.localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(0, 366)));
+    }
+
+    function migrateTodayIntoHistory() {
+      const saved = loadTodayDraw();
+      if (saved) saveHistoryEntry(saved.date, saved.cardId, saved.orientation);
+    }
+
+    function formatStamp(stamp) {
+      if (!stamp || stamp.length !== 8) return stamp || "";
+      return stamp.slice(0, 4) + "년 " + Number(stamp.slice(4, 6)) + "월 " + Number(stamp.slice(6, 8)) + "일";
+    }
+
+    function renderRecordList() {
+      const history = loadHistory();
+      recordList.innerHTML = "";
+      if (!history.length) {
+        const empty = document.createElement("p");
+        empty.className = "record-empty";
+        empty.textContent = "아직 뽑은 카드가 없다냥.";
+        recordList.appendChild(empty);
+        return;
+      }
+
+      history.forEach(function (item) {
+        const card = findCard(item.cardId);
+        if (!card) return;
+        const reversed = item.orientation === "reversed";
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "record-item";
+        btn.dataset.date = item.date;
+        btn.dataset.id = String(item.cardId);
+        btn.dataset.orientation = item.orientation;
+
+        const img = document.createElement("img");
+        img.className = "record-thumb" + (reversed ? " is-reversed" : "");
+        img.src = "assets/Card/" + card.file;
+        img.alt = "";
+
+        const meta = document.createElement("span");
+        const name = document.createElement("strong");
+        name.className = "record-item-ko";
+        name.textContent = card.ko;
+        const sub = document.createElement("span");
+        sub.className = "record-item-sub";
+        sub.textContent = formatStamp(item.date) + " · " + (reversed ? "역방향" : "정방향");
+        meta.appendChild(name);
+        meta.appendChild(sub);
+
+        btn.appendChild(img);
+        btn.appendChild(meta);
+        recordList.appendChild(btn);
+      });
     }
 
     function showToast(message) {
@@ -1795,16 +1965,27 @@
       return TAROT_CARDS.find(function (item) { return item.id === cardId; }) || null;
     }
 
-    function syncResultActions(isOwn) {
-      resultShare.hidden = !isOwn;
+    function syncResultActions(result) {
+      const isOwn = Boolean(result && result.isOwn);
+      const fromRecord = Boolean(result && result.fromRecord);
+      const isToday = Boolean(result && result.date === todayStamp());
+      resultShare.hidden = !isOwn || !isToday;
       resultHome.hidden = !isOwn;
       resultDrawToo.hidden = isOwn;
+      resultHome.textContent = fromRecord ? "기록으로" : "홈으로";
     }
 
     function isOverlayOpen() {
       return resultView.classList.contains("is-open")
         || modal.classList.contains("is-open")
-        || aboutModal.classList.contains("is-open");
+        || aboutModal.classList.contains("is-open")
+        || recordModal.classList.contains("is-open");
+    }
+
+    function setNavActive(id) {
+      navHome.classList.toggle("is-active", id === "home");
+      navRecord.classList.toggle("is-active", id === "record");
+      navAbout.classList.toggle("is-active", id === "about");
     }
 
     function lockPageScroll() {
@@ -1827,10 +2008,10 @@
     }
 
     function openAbout() {
+      closeRecord(true);
       aboutModal.classList.add("is-open");
       aboutModal.setAttribute("aria-hidden", "false");
-      navAbout.classList.add("is-active");
-      navHome.classList.remove("is-active");
+      setNavActive("about");
       lockPageScroll();
       aboutPanel.focus();
     }
@@ -1839,18 +2020,40 @@
       if (!aboutModal.classList.contains("is-open")) return;
       aboutModal.classList.remove("is-open");
       aboutModal.setAttribute("aria-hidden", "true");
-      navAbout.classList.remove("is-active");
-      navHome.classList.add("is-active");
+      if (!recordModal.classList.contains("is-open")) setNavActive("home");
+      unlockPageScroll();
+    }
+
+    function openRecord() {
+      closeAbout();
+      renderRecordList();
+      recordModal.classList.add("is-open");
+      recordModal.setAttribute("aria-hidden", "false");
+      setNavActive("record");
+      lockPageScroll();
+      recordPanel.focus();
+    }
+
+    function closeRecord(keepNav) {
+      if (!recordModal.classList.contains("is-open")) return;
+      recordModal.classList.remove("is-open");
+      recordModal.setAttribute("aria-hidden", "true");
+      if (!keepNav && !aboutModal.classList.contains("is-open")) setNavActive("home");
       unlockPageScroll();
     }
 
     function closeResult() {
+      const fromRecord = Boolean(currentResult && currentResult.fromRecord);
       resultView.classList.remove("is-open", "is-ready");
       resultView.setAttribute("aria-hidden", "true");
       currentResult = null;
       clearShareUrl();
-      unlockPageScroll();
       syncHomeDrawState();
+      if (fromRecord) {
+        openRecord();
+        return;
+      }
+      unlockPageScroll();
     }
 
     function showResult(card, orientation, options) {
@@ -1861,14 +2064,16 @@
         orientation: orientation,
         date: opts.date || todayStamp(),
         isOwn: Boolean(opts.isOwn),
+        fromRecord: Boolean(opts.fromRecord),
       };
       resultView.classList.add("is-open");
       if (opts.ready) resultView.classList.add("is-ready");
       else resultView.classList.remove("is-ready");
       resultView.setAttribute("aria-hidden", "false");
       lockPageScroll();
-      replaceShareUrl(card.id, orientation, currentResult.date);
-      syncResultActions(currentResult.isOwn);
+      if (currentResult.fromRecord) clearShareUrl();
+      else replaceShareUrl(card.id, orientation, currentResult.date);
+      syncResultActions(currentResult);
     }
 
     function openModal() {
@@ -2104,9 +2309,16 @@
       else openAbout();
     });
 
+    navRecord.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (recordModal.classList.contains("is-open")) closeRecord();
+      else openRecord();
+    });
+
     navHome.addEventListener("click", (event) => {
       event.preventDefault();
       closeAbout();
+      closeRecord();
     });
 
     aboutModal.addEventListener("click", (event) => {
@@ -2115,10 +2327,32 @@
       }
     });
 
+    recordModal.addEventListener("click", (event) => {
+      if (event.target.closest("[data-close-record]")) {
+        closeRecord();
+        return;
+      }
+      const item = event.target.closest(".record-item");
+      if (!item) return;
+      const card = findCard(Number(item.dataset.id));
+      if (!card) return;
+      closeRecord(true);
+      showResult(card, item.dataset.orientation, {
+        isOwn: true,
+        date: item.dataset.date,
+        ready: true,
+        fromRecord: true,
+      });
+    });
+
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
       if (aboutModal.classList.contains("is-open")) {
         closeAbout();
+        return;
+      }
+      if (recordModal.classList.contains("is-open")) {
+        closeRecord();
         return;
       }
       if (resultView.classList.contains("is-open")) {
@@ -2131,6 +2365,7 @@
     });
 
     (function boot() {
+      migrateTodayIntoHistory();
       syncHomeDrawState();
       const shared = readShareFromUrl();
       if (!shared) return;

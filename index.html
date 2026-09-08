@@ -977,20 +977,41 @@
         height: auto;
         max-height: 88dvh;
         aspect-ratio: 2 / 3;
-        padding: 15% 14% 14%;
+        padding: 12% 12% 11%;
         background:
           #120c22
           url("assets/card_box2.png") center center / 100% 100% no-repeat;
       }
 
+      .draw-modal-title {
+        font-size: clamp(14px, 3.6cqh, 22px);
+        margin-bottom: 2px;
+      }
+
+      .draw-modal-sub {
+        font-size: clamp(10px, 2cqh, 13px);
+        margin-bottom: 4px;
+      }
+
       .pick-cards {
         min-height: 0;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, max-content);
         grid-template-rows: repeat(5, minmax(0, 1fr));
+        justify-content: center;
+        align-items: center;
+        justify-items: center;
+        gap: clamp(4px, 1cqh, 8px) clamp(10px, 3cqw, 16px);
+        overflow: hidden;
       }
 
       .pick-card {
-        width: min(100%, 16cqh);
+        width: auto;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        min-width: 0;
+        min-height: 0;
+        aspect-ratio: 2 / 3;
       }
 
       .result-view {

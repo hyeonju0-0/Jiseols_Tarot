@@ -12,7 +12,6 @@
       --panel: rgba(22, 14, 42, 0.9);
       --panel-border: rgba(230, 220, 255, 0.45);
       --gold: #f0c85a;
-      --gold-soft: #d4a84b;
       --text: #f7f2ff;
       --muted: #b7a8d4;
       --header-h: 96px;
@@ -26,13 +25,17 @@
 
     html,
     body {
-      height: 100%;
       height: 100dvh;
       max-height: 100dvh;
       overflow: hidden;
       background: var(--bg-deep);
       color: var(--text);
       font-family: "Galmuri11", "Galmuri14", "Pretendard", sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
     }
 
     html.is-scroll-locked,
@@ -124,7 +127,8 @@
       flex-shrink: 0;
     }
 
-    .nav a {
+    .nav a,
+    .nav-paw {
       display: inline-flex;
       align-items: center;
       gap: 10px;
@@ -426,49 +430,71 @@
       color: #efe6ff;
     }
 
-    /* ===== Draw modal ===== */
-    .draw-modal {
+    /* ===== Overlays / card box ===== */
+    .draw-modal,
+    .result-view,
+    .about-modal,
+    .record-modal {
       position: fixed;
       inset: 0;
-      z-index: 1000;
       display: none;
       align-items: center;
       justify-content: center;
       padding: 3vh 2vw;
     }
 
-    .draw-modal.is-open {
+    .draw-modal { z-index: 1000; }
+    .result-view { z-index: 1100; background: rgba(6, 4, 14, 0.82); }
+    .about-modal,
+    .record-modal { z-index: 1300; }
+
+    .draw-modal.is-open,
+    .result-view.is-open,
+    .about-modal.is-open,
+    .record-modal.is-open {
       display: flex;
       overscroll-behavior: none;
     }
 
-    .draw-modal-backdrop {
+    .draw-modal-backdrop,
+    .about-modal-backdrop,
+    .record-modal-backdrop {
       position: absolute;
       inset: 0;
       background: rgba(6, 4, 14, 0.75);
     }
 
-    .draw-modal-panel {
+    .draw-modal-panel,
+    .result-panel,
+    .about-modal-panel,
+    .record-modal-panel {
       --box-ratio: 1536 / 1024;
+      --box-max: 1536px;
       position: relative;
       z-index: 1;
-      width: min(94vw, calc(88vh * 1536 / 1024), 1536px);
+      width: min(94vw, calc(88vh * 1536 / 1024), var(--box-max));
       aspect-ratio: var(--box-ratio);
       height: auto;
       max-height: 88vh;
       overflow: hidden;
-      padding: 7.5% 8.5% 5.5%;
       border-radius: 12px;
-      border: none;
-      background:
-        #120c22
-        url("assets/card_box.png") center center / 100% 100% no-repeat;
+      background: #120c22 url("assets/card_box.png") center / 100% 100% no-repeat;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-      text-align: center;
+    }
+
+    .draw-modal-panel,
+    .about-modal-panel,
+    .record-modal-panel {
+      padding: 7.5% 8.5% 5.5%;
       display: flex;
       flex-direction: column;
       container-type: size;
     }
+
+    .draw-modal-panel { text-align: center; }
+
+    .about-modal-panel,
+    .record-modal-panel { --box-max: 1200px; }
 
     .draw-modal-title {
       font-size: clamp(15px, 4.6cqh, 28px);
@@ -560,38 +586,8 @@
       background: rgba(255, 248, 230, 0.92);
     }
 
-    /* ===== Result view ===== */
-    .result-view {
-      position: fixed;
-      inset: 0;
-      z-index: 1100;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 3vh 2vw;
-      background: rgba(6, 4, 14, 0.82);
-    }
-
-    .result-view.is-open {
-      display: flex;
-      overscroll-behavior: none;
-    }
-
     .result-panel {
-      --box-ratio: 1536 / 1024;
-      width: min(94vw, calc(88vh * 1536 / 1024), 1536px);
-      aspect-ratio: var(--box-ratio);
-      height: auto;
-      max-height: 88vh;
       display: grid;
-      padding: 0;
-      border-radius: 12px;
-      border: none;
-      background:
-        #120c22
-        url("assets/card_box.png") center center / 100% 100% no-repeat;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-      overflow: hidden;
       opacity: 0;
       transform: translateY(12px);
       transition: opacity 0.45s ease, transform 0.45s ease;
@@ -607,7 +603,6 @@
       gap: clamp(10px, 2%, 24px);
       align-items: stretch;
       padding: 11% 18% 11% 11%;
-      box-sizing: border-box;
     }
 
     .result-view.is-ready .result-panel {
@@ -783,14 +778,10 @@
       line-height: 1.45;
       margin: 0;
       white-space: pre-wrap;
-      overflow: visible;
-      flex: 0 0 auto;
-      min-height: 0;
       overflow-wrap: break-word;
     }
 
     .result-cat {
-      margin-top: 0;
       padding: clamp(6px, 0.9vh, 10px) clamp(8px, 1vh, 12px);
       border-radius: 10px;
       background: rgba(120, 70, 30, 0.12);
@@ -802,11 +793,9 @@
     }
 
     .result-actions {
-      margin-top: 0;
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      padding-top: 0;
       flex-shrink: 0;
     }
 
@@ -823,7 +812,6 @@
     .result-btn.primary {
       border-color: #8a6a30;
       background: linear-gradient(180deg, #f0d9a0 0%, #d4b06a 100%);
-      color: #3b2a16;
     }
 
     .result-btn:hover {
@@ -853,52 +841,6 @@
     .toast.is-show {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
-    }
-
-    /* ===== About / record modal ===== */
-    .about-modal,
-    .record-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 1300;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 3vh 2vw;
-    }
-
-    .about-modal.is-open,
-    .record-modal.is-open {
-      display: flex;
-      overscroll-behavior: none;
-    }
-
-    .about-modal-backdrop,
-    .record-modal-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(6, 4, 14, 0.75);
-    }
-
-    .about-modal-panel,
-    .record-modal-panel {
-      --box-ratio: 1536 / 1024;
-      position: relative;
-      z-index: 1;
-      width: min(94vw, calc(88vh * 1536 / 1024), 1200px);
-      aspect-ratio: var(--box-ratio);
-      height: auto;
-      max-height: 88vh;
-      overflow: hidden;
-      padding: 7.5% 8.5% 5.5%;
-      border-radius: 12px;
-      background:
-        #120c22
-        url("assets/card_box.png") center center / 100% 100% no-repeat;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-      display: flex;
-      flex-direction: column;
-      container-type: size;
     }
 
     .about-modal-panel:focus,
@@ -962,22 +904,7 @@
       background: linear-gradient(90deg, transparent, rgba(90, 60, 30, 0.35), transparent);
     }
 
-    .about-steps {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-bottom: 8px;
-    }
-
-    .about-steps p {
-      margin-bottom: 0;
-    }
-
-    .about-steps strong {
-      display: block;
-      margin-bottom: 4px;
-    }
-
+    .about-steps,
     .about-features {
       display: flex;
       flex-direction: column;
@@ -985,10 +912,10 @@
       margin-bottom: 8px;
     }
 
-    .about-features p {
-      margin-bottom: 0;
-    }
+    .about-steps p,
+    .about-features p { margin-bottom: 0; }
 
+    .about-steps strong,
     .about-features strong {
       display: block;
       margin-bottom: 4px;
@@ -1184,17 +1111,18 @@
         font-size: clamp(22px, 6vw, 36px);
       }
 
-      .draw-modal-panel {
+      .draw-modal-panel,
+      .result-panel,
+      .about-modal-panel,
+      .record-modal-panel {
         --box-ratio: 2 / 3;
         width: min(92vw, calc(88dvh * 2 / 3), 430px);
-        height: auto;
         max-height: 88dvh;
         aspect-ratio: 2 / 3;
-        padding: 12% 12% 11%;
-        background:
-          #120c22
-          url("assets/card_box2.png") center center / 100% 100% no-repeat;
+        background-image: url("assets/card_box2.png");
       }
+
+      .draw-modal-panel { padding: 12% 12% 11%; }
 
       .draw-modal-title {
         font-size: clamp(14px, 3.6cqh, 22px);
@@ -1227,33 +1155,10 @@
         aspect-ratio: 2 / 3;
       }
 
-      .result-view {
-        padding: 1.5vh 3vw;
-      }
-
-      .result-panel {
-        --box-ratio: 2 / 3;
-        width: min(92vw, calc(88dvh * 2 / 3), 430px);
-        height: auto;
-        max-height: 88dvh;
-        aspect-ratio: 2 / 3;
-        background:
-          #120c22
-          url("assets/card_box2.png") center center / 100% 100% no-repeat;
-      }
+      .result-view { padding: 1.5vh 3vw; }
 
       .about-modal-panel,
-      .record-modal-panel {
-        --box-ratio: 2 / 3;
-        width: min(92vw, calc(88dvh * 2 / 3), 430px);
-        height: auto;
-        max-height: 88dvh;
-        aspect-ratio: 2 / 3;
-        padding: 15% 14% 12%;
-        background:
-          #120c22
-          url("assets/card_box2.png") center center / 100% 100% no-repeat;
-      }
+      .record-modal-panel { padding: 15% 14% 12%; }
 
       .about-inner h1 {
         font-size: clamp(20px, 4.6cqh, 28px);
@@ -1317,7 +1222,7 @@
       }
 
       .site-header {
-        height: 72px;
+        height: var(--header-h);
         padding: 0 14px;
       }
 
@@ -1375,9 +1280,9 @@
         <img class="nav-icon" src="assets/icon/icon_sparkle.png" alt="" />
         <span class="label">소개</span>
       </a>
-      <a href="#" aria-label="발자국">
+      <span class="nav-paw" aria-hidden="true">
         <img class="nav-icon" src="assets/icon/icon_paw.png" alt="" />
-      </a>
+      </span>
     </nav>
   </header>
 
@@ -1398,7 +1303,7 @@
 
         <img class="wizard-cat" src="assets/wizard_cat.png" alt="마법사 고양이" />
 
-        <div class="cards" id="cards" aria-label="타로 카드">
+        <div class="cards" aria-label="타로 카드">
           <button class="card" type="button" aria-label="카드 1">
             <img src="assets/card_back.png" alt="" />
           </button>
@@ -1620,48 +1525,6 @@
       { id: 21, file: "21.TheWorld.png", name: "The World", ko: "세계" },
     ];
 
-    const CARD_FORTUNE_SCORES = {
-      0: {
-        upright: { overall: 4, money: 3, love: 4, study: 3, health: 4 },
-        reversed: { overall: 2, money: 2, love: 2, study: 2, health: 2 },
-      },
-      6: {
-        upright: { overall: 4, money: 3, love: 5, study: 3, health: 4 },
-        reversed: { overall: 2, money: 2, love: 1, study: 3, health: 2 },
-      },
-      7: {
-        upright: { overall: 5, money: 4, love: 3, study: 5, health: 4 },
-        reversed: { overall: 2, money: 2, love: 2, study: 2, health: 2 },
-      },
-      9: {
-        upright: { overall: 3, money: 3, love: 2, study: 5, health: 3 },
-        reversed: { overall: 2, money: 2, love: 1, study: 2, health: 2 },
-      },
-      10: {
-        upright: { overall: 5, money: 5, love: 4, study: 4, health: 4 },
-        reversed: { overall: 2, money: 1, love: 2, study: 2, health: 2 },
-      },
-      13: {
-        upright: { overall: 3, money: 3, love: 3, study: 3, health: 3 },
-        reversed: { overall: 2, money: 2, love: 1, study: 2, health: 2 },
-      },
-      15: {
-        upright: { overall: 2, money: 2, love: 4, study: 2, health: 2 },
-        reversed: { overall: 3, money: 2, love: 2, study: 3, health: 3 },
-      },
-      16: {
-        upright: { overall: 1, money: 1, love: 2, study: 2, health: 1 },
-        reversed: { overall: 1, money: 2, love: 2, study: 2, health: 1 },
-      },
-      19: {
-        upright: { overall: 5, money: 5, love: 5, study: 5, health: 5 },
-        reversed: { overall: 3, money: 3, love: 3, study: 3, health: 2 },
-      },
-      21: {
-        upright: { overall: 5, money: 5, love: 5, study: 5, health: 5 },
-        reversed: { overall: 4, money: 3, love: 3, study: 4, health: 3 },
-      },
-    };
 
     const FORTUNE_LABELS = [
       { key: "overall", label: "종합운" },
@@ -1671,37 +1534,32 @@
       { key: "health", label: "건강운" },
     ];
 
+    const CARD_FORTUNE_SCORES = {
+      0:  { upright: [4, 3, 4, 3, 4], reversed: [2, 2, 2, 2, 2] },
+      6:  { upright: [4, 3, 5, 3, 4], reversed: [2, 2, 1, 3, 2] },
+      7:  { upright: [5, 4, 3, 5, 4], reversed: [2, 2, 2, 2, 2] },
+      9:  { upright: [3, 3, 2, 5, 3], reversed: [2, 2, 1, 2, 2] },
+      10: { upright: [5, 5, 4, 4, 4], reversed: [2, 1, 2, 2, 2] },
+      13: { upright: [3, 3, 3, 3, 3], reversed: [2, 2, 1, 2, 2] },
+      15: { upright: [2, 2, 4, 2, 2], reversed: [3, 2, 2, 3, 3] },
+      16: { upright: [1, 1, 2, 2, 1], reversed: [1, 2, 2, 2, 1] },
+      19: { upright: [5, 5, 5, 5, 5], reversed: [3, 3, 3, 3, 2] },
+      21: { upright: [5, 5, 5, 5, 5], reversed: [4, 3, 3, 4, 3] },
+    };
+
     const LUCKY_ITEMS = [
-      "행운 거북이",
-      "미니 다이어리",
-      "조약돌",
-      "손거울",
-      "실버 반지",
-      "책갈피",
-      "500원",
-      "진주 귀걸이",
-      "동전 지갑",
-      "별 모양 스티커",
-      "손수건",
-      "손목시계",
-      "작은 화분",
-      "콧수염 안경",
-      "검정 볼펜",
+      "행운 거북이", "미니 다이어리", "조약돌", "손거울", "실버 반지",
+      "책갈피", "500원", "진주 귀걸이", "동전 지갑", "별 모양 스티커",
+      "손수건", "손목시계", "작은 화분", "콧수염 안경", "검정 볼펜",
     ];
 
     const LUCKY_COLORS = [
-      { name: "보라", hex: "#7B5EA7" },
-      { name: "남색", hex: "#2F4A7A" },
-      { name: "골드", hex: "#D4A84B" },
-      { name: "실버", hex: "#C0C5CE" },
-      { name: "분홍", hex: "#E8A0B5" },
-      { name: "초록", hex: "#5E9B6A" },
-      { name: "하늘", hex: "#7EB6D9" },
-      { name: "하양", hex: "#F5F2EA" },
-      { name: "검정", hex: "#2A2A2A" },
-      { name: "주황", hex: "#E39A5C" },
-      { name: "빨강", hex: "#8B3A4A" },
-      { name: "파랑", hex: "#7DC8B8" },
+      { name: "보라", hex: "#7B5EA7" }, { name: "남색", hex: "#2F4A7A" },
+      { name: "골드", hex: "#D4A84B" }, { name: "실버", hex: "#C0C5CE" },
+      { name: "분홍", hex: "#E8A0B5" }, { name: "초록", hex: "#5E9B6A" },
+      { name: "하늘", hex: "#7EB6D9" }, { name: "하양", hex: "#F5F2EA" },
+      { name: "검정", hex: "#2A2A2A" }, { name: "주황", hex: "#E39A5C" },
+      { name: "빨강", hex: "#8B3A4A" }, { name: "파랑", hex: "#7DC8B8" },
     ];
 
     function shuffle(list) {
@@ -1714,10 +1572,10 @@
     }
 
     function pickFortuneMessage(category, score, seed) {
-      if (typeof fortuneMessages === "undefined") return "";
-      const list = fortuneMessages[category] && fortuneMessages[category][score];
-      if (!list || !list.length) return "";
-      return list[Math.abs(seed) % list.length];
+      const list = typeof fortuneMessages !== "undefined"
+        && fortuneMessages[category]
+        && fortuneMessages[category][score];
+      return list && list.length ? list[Math.abs(seed) % list.length] : "";
     }
 
     function starEmoji(score) {
@@ -1726,12 +1584,9 @@
     }
 
     function getCardFortunes(cardId, orientation) {
-      const scores =
-        (CARD_FORTUNE_SCORES[cardId] && CARD_FORTUNE_SCORES[cardId][orientation]) ||
-        { overall: 3, money: 3, love: 3, study: 3, health: 3 };
-
+      const scores = (CARD_FORTUNE_SCORES[cardId] && CARD_FORTUNE_SCORES[cardId][orientation]) || [3, 3, 3, 3, 3];
       return FORTUNE_LABELS.map((item, index) => {
-        const score = scores[item.key];
+        const score = scores[index];
         const seed = cardId * 17 + index * 3 + (orientation === "reversed" ? 11 : 0);
         return {
           label: item.label,
@@ -1744,41 +1599,43 @@
 
     function pickLuckyExtras(cardId, orientation) {
       const seed = cardId * 13 + (orientation === "reversed" ? 7 : 3);
-      const item = LUCKY_ITEMS[Math.abs(seed) % LUCKY_ITEMS.length];
-      const color = LUCKY_COLORS[Math.abs(seed * 5 + 2) % LUCKY_COLORS.length];
-      const number = (Math.abs(seed * 9) % 31) + 1;
-      return { item, color, numbers: String(number) };
+      return {
+        item: LUCKY_ITEMS[Math.abs(seed) % LUCKY_ITEMS.length],
+        color: LUCKY_COLORS[Math.abs(seed * 5 + 2) % LUCKY_COLORS.length],
+        numbers: String((Math.abs(seed * 9) % 31) + 1),
+      };
     }
 
     const STORAGE_KEY = "jiseolsTarot.today";
     const HISTORY_KEY = "jiseolsTarot.history";
-    const drawBtn = document.getElementById("draw-btn");
-    const drawBtnLabel = document.getElementById("draw-btn-label");
-    const homeSpeech = document.getElementById("home-speech");
-    const modal = document.getElementById("draw-modal");
-    const pickCards = document.getElementById("pick-cards");
-    const resultView = document.getElementById("result-view");
-    const resultCardImg = document.getElementById("result-card-img");
-    const resultOrientation = document.getElementById("result-orientation");
-    const resultCardName = document.getElementById("result-card-name");
-    const resultCardEn = document.getElementById("result-card-en");
-    const resultTitle = document.getElementById("result-title");
-    const resultLucky = document.getElementById("result-lucky");
-    const resultFortunes = document.getElementById("result-fortunes");
-    const resultDescription = document.getElementById("result-description");
-    const resultCat = document.getElementById("result-cat");
-    const resultShare = document.getElementById("result-share");
-    const resultDrawToo = document.getElementById("result-draw-too");
-    const resultHome = document.getElementById("result-home");
-    const toastEl = document.getElementById("toast");
-    const aboutModal = document.getElementById("about-modal");
+    const $ = (id) => document.getElementById(id);
+    const drawBtn = $("draw-btn");
+    const drawBtnLabel = $("draw-btn-label");
+    const homeSpeech = $("home-speech");
+    const modal = $("draw-modal");
+    const pickCards = $("pick-cards");
+    const resultView = $("result-view");
+    const resultCardImg = $("result-card-img");
+    const resultOrientation = $("result-orientation");
+    const resultCardName = $("result-card-name");
+    const resultCardEn = $("result-card-en");
+    const resultTitle = $("result-title");
+    const resultLucky = $("result-lucky");
+    const resultFortunes = $("result-fortunes");
+    const resultDescription = $("result-description");
+    const resultCat = $("result-cat");
+    const resultShare = $("result-share");
+    const resultDrawToo = $("result-draw-too");
+    const resultHome = $("result-home");
+    const toastEl = $("toast");
+    const aboutModal = $("about-modal");
     const aboutPanel = aboutModal.querySelector(".about-modal-panel");
-    const recordModal = document.getElementById("record-modal");
+    const recordModal = $("record-modal");
     const recordPanel = recordModal.querySelector(".record-modal-panel");
-    const recordList = document.getElementById("record-list");
-    const navHome = document.getElementById("nav-home");
-    const navRecord = document.getElementById("nav-record");
-    const navAbout = document.getElementById("nav-about");
+    const recordList = $("record-list");
+    const navHome = $("nav-home");
+    const navRecord = $("nav-record");
+    const navAbout = $("nav-about");
 
     let hasPicked = false;
     let currentResult = null;
@@ -1786,14 +1643,23 @@
 
     function todayStamp() {
       const now = new Date();
-      const month = String(now.getMonth() + 1).padStart(2, "0");
-      const day = String(now.getDate()).padStart(2, "0");
-      return String(now.getFullYear()) + month + day;
+      return String(now.getFullYear())
+        + String(now.getMonth() + 1).padStart(2, "0")
+        + String(now.getDate()).padStart(2, "0");
+    }
+
+    function findCard(cardId) {
+      return TAROT_CARDS.find((item) => item.id === cardId) || null;
+    }
+
+    function isValidDraw(cardId, orientation, date) {
+      if (date != null && !/^\d{8}$/.test(date)) return false;
+      if (orientation !== "upright" && orientation !== "reversed") return false;
+      return Boolean(findCard(cardId));
     }
 
     function encodeShareToken(cardId, orientation, date) {
-      const dir = orientation === "reversed" ? "r" : "u";
-      return cardId + "." + dir + "." + date;
+      return cardId + "." + (orientation === "reversed" ? "r" : "u") + "." + date;
     }
 
     function parseShareToken(token) {
@@ -1802,22 +1668,16 @@
       if (parts.length !== 3) return null;
       const cardId = Number(parts[0]);
       const orientation = parts[1] === "r" ? "reversed" : parts[1] === "u" ? "upright" : null;
-      const date = parts[2];
-      if (!orientation || !/^\d{8}$/.test(date)) return null;
-      if (!TAROT_CARDS.some(function (item) { return item.id === cardId; })) return null;
-      return { cardId: cardId, orientation: orientation, date: date };
+      if (!orientation || !isValidDraw(cardId, orientation, parts[2])) return null;
+      return { cardId, orientation, date: parts[2] };
     }
 
     function readShareFromUrl() {
-      try {
-        return parseShareToken(new URL(window.location.href).searchParams.get("s"));
-      } catch (err) {
-        return null;
-      }
+      return parseShareToken(new URLSearchParams(location.search).get("s"));
     }
 
     function shareUrlFor(cardId, orientation, date) {
-      const url = new URL(window.location.href);
+      const url = new URL(location.href);
       url.search = "";
       url.hash = "";
       url.searchParams.set("s", encodeShareToken(cardId, orientation, date));
@@ -1825,72 +1685,51 @@
     }
 
     function replaceShareUrl(cardId, orientation, date) {
-      const next = shareUrlFor(cardId, orientation, date);
-      window.history.replaceState(null, "", next);
+      history.replaceState(null, "", shareUrlFor(cardId, orientation, date));
     }
 
     function clearShareUrl() {
-      const url = new URL(window.location.href);
+      const url = new URL(location.href);
       url.searchParams.delete("s");
       const search = url.searchParams.toString();
-      window.history.replaceState(null, "", url.pathname + (search ? "?" + search : "") + url.hash);
+      history.replaceState(null, "", url.pathname + (search ? "?" + search : "") + url.hash);
     }
 
-    function loadTodayDraw() {
+    function readJson(key, fallback) {
       try {
-        const raw = window.localStorage.getItem(STORAGE_KEY);
-        if (!raw) return null;
-        const saved = JSON.parse(raw);
-        if (!saved || saved.date !== todayStamp()) return null;
-        if (!TAROT_CARDS.some(function (item) { return item.id === saved.cardId; })) return null;
-        if (saved.orientation !== "upright" && saved.orientation !== "reversed") return null;
-        return saved;
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
       } catch (err) {
-        return null;
+        return fallback;
       }
     }
 
+    function loadTodayDraw() {
+      const saved = readJson(STORAGE_KEY, null);
+      if (!saved || saved.date !== todayStamp()) return null;
+      return isValidDraw(saved.cardId, saved.orientation, saved.date) ? saved : null;
+    }
+
     function saveTodayDraw(cardId, orientation) {
-      const payload = {
-        date: todayStamp(),
-        cardId: cardId,
-        orientation: orientation,
-      };
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      const payload = { date: todayStamp(), cardId, orientation };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       saveHistoryEntry(payload.date, cardId, orientation);
       return payload;
     }
 
-    function isValidHistoryEntry(item) {
-      if (!item || !/^\d{8}$/.test(item.date)) return false;
-      if (item.orientation !== "upright" && item.orientation !== "reversed") return false;
-      return TAROT_CARDS.some(function (card) { return card.id === item.cardId; });
-    }
-
     function loadHistory() {
-      try {
-        const raw = window.localStorage.getItem(HISTORY_KEY);
-        if (!raw) return [];
-        const list = JSON.parse(raw);
-        if (!Array.isArray(list)) return [];
-        return list
-          .filter(isValidHistoryEntry)
-          .sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
-      } catch (err) {
-        return [];
-      }
+      const list = readJson(HISTORY_KEY, []);
+      if (!Array.isArray(list)) return [];
+      return list
+        .filter((item) => isValidDraw(item.cardId, item.orientation, item.date))
+        .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
     }
 
     function saveHistoryEntry(date, cardId, orientation) {
-      if (!isValidHistoryEntry({ date: date, cardId: cardId, orientation: orientation })) return;
-      const list = loadHistory().filter(function (item) { return item.date !== date; });
-      list.unshift({ date: date, cardId: cardId, orientation: orientation });
-      window.localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(0, 366)));
-    }
-
-    function migrateTodayIntoHistory() {
-      const saved = loadTodayDraw();
-      if (saved) saveHistoryEntry(saved.date, saved.cardId, saved.orientation);
+      if (!isValidDraw(cardId, orientation, date)) return;
+      const list = loadHistory().filter((item) => item.date !== date);
+      list.unshift({ date, cardId, orientation });
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(0, 366)));
     }
 
     function formatStamp(stamp) {
@@ -1900,69 +1739,36 @@
 
     function renderRecordList() {
       const history = loadHistory();
-      recordList.innerHTML = "";
       if (!history.length) {
-        const empty = document.createElement("p");
-        empty.className = "record-empty";
-        empty.textContent = "아직 뽑은 카드가 없다냥.";
-        recordList.appendChild(empty);
+        recordList.innerHTML = '<p class="record-empty">아직 뽑은 카드가 없다냥.</p>';
         return;
       }
-
-      history.forEach(function (item) {
+      recordList.innerHTML = history.map((item) => {
         const card = findCard(item.cardId);
-        if (!card) return;
+        if (!card) return "";
         const reversed = item.orientation === "reversed";
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "record-item";
-        btn.dataset.date = item.date;
-        btn.dataset.id = String(item.cardId);
-        btn.dataset.orientation = item.orientation;
-
-        const img = document.createElement("img");
-        img.className = "record-thumb" + (reversed ? " is-reversed" : "");
-        img.src = "assets/Card/" + card.file;
-        img.alt = "";
-
-        const meta = document.createElement("span");
-        const name = document.createElement("strong");
-        name.className = "record-item-ko";
-        name.textContent = card.ko;
-        const sub = document.createElement("span");
-        sub.className = "record-item-sub";
-        sub.textContent = formatStamp(item.date) + " · " + (reversed ? "역방향" : "정방향");
-        meta.appendChild(name);
-        meta.appendChild(sub);
-
-        btn.appendChild(img);
-        btn.appendChild(meta);
-        recordList.appendChild(btn);
-      });
+        return (
+          '<button type="button" class="record-item" data-date="' + item.date
+          + '" data-id="' + item.cardId + '" data-orientation="' + item.orientation + '">'
+          + '<img class="record-thumb' + (reversed ? " is-reversed" : "") + '" src="assets/Card/' + card.file + '" alt="">'
+          + '<span><strong class="record-item-ko">' + card.ko + "</strong>"
+          + '<span class="record-item-sub">' + formatStamp(item.date) + " · " + (reversed ? "역방향" : "정방향")
+          + "</span></span></button>"
+        );
+      }).join("");
     }
 
     function showToast(message) {
       toastEl.textContent = message;
       toastEl.classList.add("is-show");
-      window.clearTimeout(toastTimer);
-      toastTimer = window.setTimeout(function () {
-        toastEl.classList.remove("is-show");
-      }, 2400);
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove("is-show"), 2400);
     }
 
     function syncHomeDrawState() {
       const saved = loadTodayDraw();
-      if (saved) {
-        drawBtnLabel.textContent = "오늘의 결과";
-        homeSpeech.textContent = "오늘은 이미 운세를 봤다냥!";
-      } else {
-        drawBtnLabel.textContent = "카드 뽑기";
-        homeSpeech.textContent = "오늘의 운세를 뽑아볼까냥?";
-      }
-    }
-
-    function findCard(cardId) {
-      return TAROT_CARDS.find(function (item) { return item.id === cardId; }) || null;
+      drawBtnLabel.textContent = saved ? "오늘의 결과" : "카드 뽑기";
+      homeSpeech.textContent = saved ? "오늘은 이미 운세를 봤다냥!" : "오늘의 운세를 뽑아볼까냥?";
     }
 
     function syncResultActions(result) {
@@ -1975,11 +1781,17 @@
       resultHome.textContent = fromRecord ? "기록으로" : "홈으로";
     }
 
+    function isOpen(el) {
+      return el.classList.contains("is-open");
+    }
+
     function isOverlayOpen() {
-      return resultView.classList.contains("is-open")
-        || modal.classList.contains("is-open")
-        || aboutModal.classList.contains("is-open")
-        || recordModal.classList.contains("is-open");
+      return isOpen(resultView) || isOpen(modal) || isOpen(aboutModal) || isOpen(recordModal);
+    }
+
+    function setOpen(el, open) {
+      el.classList.toggle("is-open", open);
+      el.setAttribute("aria-hidden", open ? "false" : "true");
     }
 
     function setNavActive(id) {
@@ -1990,7 +1802,7 @@
 
     function lockPageScroll() {
       if (document.documentElement.classList.contains("is-scroll-locked")) return;
-      const y = window.scrollY || window.pageYOffset || 0;
+      const y = window.scrollY || 0;
       document.documentElement.classList.add("is-scroll-locked");
       document.body.classList.add("is-scroll-locked");
       document.body.style.top = "-" + y + "px";
@@ -2009,36 +1821,32 @@
 
     function openAbout() {
       closeRecord(true);
-      aboutModal.classList.add("is-open");
-      aboutModal.setAttribute("aria-hidden", "false");
+      setOpen(aboutModal, true);
       setNavActive("about");
       lockPageScroll();
       aboutPanel.focus();
     }
 
     function closeAbout() {
-      if (!aboutModal.classList.contains("is-open")) return;
-      aboutModal.classList.remove("is-open");
-      aboutModal.setAttribute("aria-hidden", "true");
-      if (!recordModal.classList.contains("is-open")) setNavActive("home");
+      if (!isOpen(aboutModal)) return;
+      setOpen(aboutModal, false);
+      if (!isOpen(recordModal)) setNavActive("home");
       unlockPageScroll();
     }
 
     function openRecord() {
       closeAbout();
       renderRecordList();
-      recordModal.classList.add("is-open");
-      recordModal.setAttribute("aria-hidden", "false");
+      setOpen(recordModal, true);
       setNavActive("record");
       lockPageScroll();
       recordPanel.focus();
     }
 
     function closeRecord(keepNav) {
-      if (!recordModal.classList.contains("is-open")) return;
-      recordModal.classList.remove("is-open");
-      recordModal.setAttribute("aria-hidden", "true");
-      if (!keepNav && !aboutModal.classList.contains("is-open")) setNavActive("home");
+      if (!isOpen(recordModal)) return;
+      setOpen(recordModal, false);
+      if (!keepNav && !isOpen(aboutModal)) setNavActive("home");
       unlockPageScroll();
     }
 
@@ -2061,15 +1869,13 @@
       fillResult(card, orientation);
       currentResult = {
         cardId: card.id,
-        orientation: orientation,
+        orientation,
         date: opts.date || todayStamp(),
         isOwn: Boolean(opts.isOwn),
         fromRecord: Boolean(opts.fromRecord),
       };
-      resultView.classList.add("is-open");
-      if (opts.ready) resultView.classList.add("is-ready");
-      else resultView.classList.remove("is-ready");
-      resultView.setAttribute("aria-hidden", "false");
+      setOpen(resultView, true);
+      resultView.classList.toggle("is-ready", Boolean(opts.ready));
       lockPageScroll();
       if (currentResult.fromRecord) clearShareUrl();
       else replaceShareUrl(card.id, orientation, currentResult.date);
@@ -2077,41 +1883,26 @@
     }
 
     function openModal() {
-      const deck = shuffle(TAROT_CARDS);
       hasPicked = false;
-
-      pickCards.innerHTML = "";
-      deck.forEach((card, index) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "pick-card";
-        btn.setAttribute("aria-label", "카드 " + (index + 1));
-        btn.dataset.id = String(card.id);
-        btn.dataset.front = "assets/Card/" + card.file;
-        btn.dataset.name = card.name;
-        btn.dataset.ko = card.ko;
-
-        const img = document.createElement("img");
-        img.src = "assets/card_back.png";
-        img.alt = "";
-        btn.appendChild(img);
-        pickCards.appendChild(btn);
-      });
-
-      modal.classList.add("is-open");
-      modal.setAttribute("aria-hidden", "false");
+      pickCards.innerHTML = shuffle(TAROT_CARDS).map((card, index) => (
+        '<button type="button" class="pick-card" aria-label="카드 ' + (index + 1)
+        + '" data-id="' + card.id + '" data-front="assets/Card/' + card.file
+        + '" data-ko="' + card.ko + '">'
+        + '<img src="assets/card_back.png" alt=""></button>'
+      )).join("");
+      setOpen(modal, true);
       lockPageScroll();
     }
 
     function closeModal() {
-      modal.classList.remove("is-open");
-      modal.setAttribute("aria-hidden", "true");
+      setOpen(modal, false);
       unlockPageScroll();
     }
 
     function fillResult(card, orientation) {
-      const meaningRoot = (typeof tarotMessages !== "undefined" && tarotMessages[card.id]) || null;
-      const meaning = meaningRoot ? meaningRoot[orientation] : null;
+      const meaning = typeof tarotMessages !== "undefined"
+        && tarotMessages[card.id]
+        && tarotMessages[card.id][orientation];
       const isReversed = orientation === "reversed";
       const fortunes = getCardFortunes(card.id, orientation);
       const lucky = pickLuckyExtras(card.id, orientation);
@@ -2124,70 +1915,53 @@
       resultCardEn.textContent = card.name;
 
       resultLucky.innerHTML =
-        "<span>행운 아이템 · " + lucky.item + "</span>" +
-        "<span>행운 숫자 · " + lucky.numbers + "</span>" +
-        "<span>" +
-          "행운 색깔 · " +
-          '<span class="lucky-swatch" style="background:' + lucky.color.hex + '"></span>' +
-          lucky.color.name +
-        "</span>";
+        "<span>행운 아이템 · " + lucky.item + "</span>"
+        + "<span>행운 숫자 · " + lucky.numbers + "</span>"
+        + "<span>행운 색깔 · "
+        + '<span class="lucky-swatch" style="background:' + lucky.color.hex + '"></span>'
+        + lucky.color.name + "</span>";
 
-      resultFortunes.innerHTML = fortunes
-        .map(function (item) {
-          return (
-            '<div class="fortune-row">' +
-              '<span class="fortune-label">' + item.label + "</span>" +
-              '<span class="fortune-stars" aria-label="' + item.score + '점">' + item.stars + "</span>" +
-              '<span class="fortune-msg">' + (item.message || "") + "</span>" +
-            "</div>"
-          );
-        })
-        .join("");
+      resultFortunes.innerHTML = fortunes.map((item) => (
+        '<div class="fortune-row">'
+        + '<span class="fortune-label">' + item.label + "</span>"
+        + '<span class="fortune-stars" aria-label="' + item.score + '점">' + item.stars + "</span>"
+        + '<span class="fortune-msg">' + (item.message || "") + "</span>"
+        + "</div>"
+      )).join("");
 
-      if (meaning) {
-        resultTitle.textContent = meaning.title;
-        resultDescription.textContent = meaning.description;
-        resultCat.textContent = meaning.catMessage;
-      } else {
-        resultTitle.textContent = "카드 해석을 불러오지 못했어요.";
-        resultDescription.textContent = "TarotCardMeanings 데이터를 확인해주세요.";
-        resultCat.textContent = "";
-      }
+      resultTitle.textContent = meaning ? meaning.title : "카드 해석을 불러오지 못했어요.";
+      resultDescription.textContent = meaning ? meaning.description : "해석 데이터를 확인해주세요.";
+      resultCat.textContent = meaning ? meaning.catMessage : "";
     }
 
     function getResultCardTargetRect() {
       const imgRect = resultCardImg.getBoundingClientRect();
       if (imgRect.width > 8 && imgRect.height > 8) {
-        return {
-          left: imgRect.left,
-          top: imgRect.top,
-          width: imgRect.width,
-          height: imgRect.height,
-        };
+        return { left: imgRect.left, top: imgRect.top, width: imgRect.width, height: imgRect.height };
       }
-
-      const col = resultView.querySelector(".result-card-col");
-      const colRect = col.getBoundingClientRect();
+      const colRect = resultView.querySelector(".result-card-col").getBoundingClientRect();
       const width = Math.min(colRect.width * 0.86, colRect.height * 0.58 * 2 / 3);
       const height = width * 1.5;
-      const left = colRect.left + (colRect.width - width) / 2;
-      const top = colRect.top + Math.max(0, (colRect.height - height) / 2 - 12);
-      return { left, top, width, height };
+      return {
+        left: colRect.left + (colRect.width - width) / 2,
+        top: colRect.top + Math.max(0, (colRect.height - height) / 2 - 12),
+        width,
+        height,
+      };
+    }
+
+    function applyRect(el, rect) {
+      el.style.left = rect.left + "px";
+      el.style.top = rect.top + "px";
+      el.style.width = rect.width + "px";
+      el.style.height = rect.height + "px";
     }
 
     function showResultWithFlight(fromEl, card, orientation) {
-      const start = fromEl.getBoundingClientRect();
       const fly = document.createElement("div");
       fly.className = "fly-card" + (orientation === "reversed" ? " is-reversed" : "");
-      fly.style.left = start.left + "px";
-      fly.style.top = start.top + "px";
-      fly.style.width = start.width + "px";
-      fly.style.height = start.height + "px";
-
-      const flyImg = document.createElement("img");
-      flyImg.src = "assets/Card/" + card.file;
-      flyImg.alt = card.ko;
-      fly.appendChild(flyImg);
+      applyRect(fly, fromEl.getBoundingClientRect());
+      fly.innerHTML = '<img src="assets/Card/' + card.file + '" alt="' + card.ko + '">';
       document.body.appendChild(fly);
 
       saveTodayDraw(card.id, orientation);
@@ -2195,47 +1969,36 @@
       closeModal();
 
       const target = getResultCardTargetRect();
-
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => {
-          fly.style.left = target.left + "px";
-          fly.style.top = target.top + "px";
-          fly.style.width = target.width + "px";
-          fly.style.height = target.height + "px";
-        });
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => applyRect(fly, target));
       });
 
-      window.setTimeout(() => {
+      setTimeout(() => {
         resultView.classList.add("is-ready");
         fly.style.opacity = "0";
-        window.setTimeout(() => fly.remove(), 280);
+        setTimeout(() => fly.remove(), 280);
       }, 850);
     }
 
-    drawBtn.addEventListener("click", () => {
+    function openSavedOrDraw() {
       const saved = loadTodayDraw();
-      if (saved) {
-        const card = findCard(saved.cardId);
-        if (card) {
-          showResult(card, saved.orientation, { isOwn: true, date: saved.date, ready: true });
-          return;
-        }
-      }
-      openModal();
-    });
+      const card = saved && findCard(saved.cardId);
+      if (card) showResult(card, saved.orientation, { isOwn: true, date: saved.date, ready: true });
+      else openModal();
+    }
+
+    drawBtn.addEventListener("click", openSavedOrDraw);
 
     pickCards.addEventListener("click", (event) => {
       const cardBtn = event.target.closest(".pick-card");
       if (!cardBtn || hasPicked || cardBtn.classList.contains("is-flipped")) return;
 
       hasPicked = true;
-      const cardId = Number(cardBtn.dataset.id);
-      const card = TAROT_CARDS.find((item) => item.id === cardId);
+      const card = findCard(Number(cardBtn.dataset.id));
       const orientation = Math.random() < 0.5 ? "upright" : "reversed";
       const img = cardBtn.querySelector("img");
 
       cardBtn.classList.add("is-flipping");
-
       pickCards.querySelectorAll(".pick-card").forEach((other) => {
         if (other !== cardBtn) {
           other.classList.add("is-dimmed");
@@ -2243,39 +2006,29 @@
         }
       });
 
-      window.setTimeout(() => {
+      setTimeout(() => {
         img.src = cardBtn.dataset.front;
         img.alt = cardBtn.dataset.ko || "";
         cardBtn.classList.remove("is-flipping");
         cardBtn.classList.add("is-flipped");
-        if (orientation === "reversed") {
-          img.style.transform = "rotate(180deg)";
-        }
-
-        window.setTimeout(() => {
+        if (orientation === "reversed") img.style.transform = "rotate(180deg)";
+        setTimeout(() => {
           if (card) showResultWithFlight(cardBtn, card, orientation);
         }, 450);
       }, 280);
     });
 
     modal.addEventListener("click", (event) => {
-      if (event.target.closest("[data-close-modal]")) {
-        closeModal();
-      }
+      if (event.target.closest("[data-close-modal]")) closeModal();
     });
 
     resultShare.addEventListener("click", async () => {
       if (!currentResult || !currentResult.isOwn) return;
       const url = shareUrlFor(currentResult.cardId, currentResult.orientation, currentResult.date);
-      const shareData = {
-        title: "설이의 타로",
-        text: "오늘의 타로 운세를 봐달라냥!",
-        url: url,
-      };
 
       try {
         if (navigator.share) {
-          await navigator.share(shareData);
+          await navigator.share({ title: "설이의 타로", text: "오늘의 타로 운세를 봐달라냥!", url });
           return;
         }
       } catch (err) {
@@ -2287,32 +2040,23 @@
         const prev = resultShare.textContent;
         resultShare.textContent = "복사했어요";
         showToast("결과 링크를 복사했다냥. 오늘만 볼 수 있다냥!");
-        window.setTimeout(function () {
-          resultShare.textContent = prev;
-        }, 1600);
+        setTimeout(() => { resultShare.textContent = prev; }, 1600);
       } catch (err) {
-        window.prompt("이 링크를 복사해서 공유해 주세요.", url);
+        prompt("이 링크를 복사해서 공유해 주세요.", url);
       }
     });
 
-    resultDrawToo.addEventListener("click", () => {
-      closeResult();
-    });
-
-    resultHome.addEventListener("click", () => {
-      closeResult();
-    });
+    resultDrawToo.addEventListener("click", closeResult);
+    resultHome.addEventListener("click", closeResult);
 
     navAbout.addEventListener("click", (event) => {
       event.preventDefault();
-      if (aboutModal.classList.contains("is-open")) closeAbout();
-      else openAbout();
+      isOpen(aboutModal) ? closeAbout() : openAbout();
     });
 
     navRecord.addEventListener("click", (event) => {
       event.preventDefault();
-      if (recordModal.classList.contains("is-open")) closeRecord();
-      else openRecord();
+      isOpen(recordModal) ? closeRecord() : openRecord();
     });
 
     navHome.addEventListener("click", (event) => {
@@ -2322,9 +2066,7 @@
     });
 
     aboutModal.addEventListener("click", (event) => {
-      if (event.target.closest("[data-close-about]")) {
-        closeAbout();
-      }
+      if (event.target.closest("[data-close-about]")) closeAbout();
     });
 
     recordModal.addEventListener("click", (event) => {
@@ -2347,26 +2089,17 @@
 
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
-      if (aboutModal.classList.contains("is-open")) {
-        closeAbout();
-        return;
-      }
-      if (recordModal.classList.contains("is-open")) {
-        closeRecord();
-        return;
-      }
-      if (resultView.classList.contains("is-open")) {
-        closeResult();
-        return;
-      }
-      if (modal.classList.contains("is-open")) {
-        closeModal();
-      }
+      if (isOpen(aboutModal)) closeAbout();
+      else if (isOpen(recordModal)) closeRecord();
+      else if (isOpen(resultView)) closeResult();
+      else if (isOpen(modal)) closeModal();
     });
 
     (function boot() {
-      migrateTodayIntoHistory();
+      const saved = loadTodayDraw();
+      if (saved) saveHistoryEntry(saved.date, saved.cardId, saved.orientation);
       syncHomeDrawState();
+
       const shared = readShareFromUrl();
       if (!shared) return;
 
@@ -2383,18 +2116,10 @@
         return;
       }
 
-      const saved = loadTodayDraw();
       const isOwn = Boolean(
-        saved &&
-        saved.cardId === shared.cardId &&
-        saved.orientation === shared.orientation
+        saved && saved.cardId === shared.cardId && saved.orientation === shared.orientation
       );
-
-      showResult(card, shared.orientation, {
-        isOwn: isOwn,
-        date: shared.date,
-        ready: true,
-      });
+      showResult(card, shared.orientation, { isOwn, date: shared.date, ready: true });
     })();
   </script>
 </body>

@@ -945,6 +945,40 @@
       object-fit: cover;
     }
 
+    .about-cards {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px 8px;
+      margin: 4px 0 16px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .about-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .about-card img {
+      width: 100%;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      border-radius: 6px;
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.22);
+      background: #2a1a4a;
+    }
+
+    .about-card span {
+      font-size: clamp(10px, 1.8cqh, 12px);
+      line-height: 1.3;
+      text-align: center;
+      color: #5d4630;
+      word-break: keep-all;
+    }
+
     .record-list {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1176,6 +1210,18 @@
 
       .record-list {
         grid-template-columns: 1fr;
+      }
+
+      .about-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: min(100%, 220px);
+        margin-left: auto;
+        margin-right: auto;
+        gap: 10px 12px;
+      }
+
+      .about-card span {
+        font-size: clamp(11px, 2.2cqh, 13px);
       }
 
       .about-lead,
@@ -1439,6 +1485,11 @@
 
           <hr class="about-rule" />
 
+          <h2>✦ 설이가 준비한 카드</h2>
+          <ul class="about-cards" id="about-cards" aria-label="타로 카드 10장"></ul>
+
+          <hr class="about-rule" />
+
           <h2>✦ 어떻게 이용하나요?</h2>
           <div class="about-steps">
             <p>
@@ -1640,6 +1691,7 @@
     const toastEl = $("toast");
     const aboutModal = $("about-modal");
     const aboutPanel = aboutModal.querySelector(".about-modal-panel");
+    const aboutCards = $("about-cards");
     const recordModal = $("record-modal");
     const recordPanel = recordModal.querySelector(".record-modal-panel");
     const recordList = $("record-list");
@@ -2106,6 +2158,13 @@
     });
 
     (function boot() {
+      aboutCards.innerHTML = TAROT_CARDS.map((card) => (
+        '<li class="about-card">'
+        + '<img src="assets/Card/' + card.file + '" alt="' + card.ko + '">'
+        + "<span>" + card.ko + "</span>"
+        + "</li>"
+      )).join("");
+
       const saved = loadTodayDraw();
       if (saved) saveHistoryEntry(saved.date, saved.cardId, saved.orientation);
       syncHomeDrawState();
